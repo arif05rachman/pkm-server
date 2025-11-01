@@ -64,14 +64,7 @@ curl -X POST http://localhost:3000/api/auth/refresh \
   }'
 ```
 
-### 5. Get User Permissions
-
-```bash
-curl -X GET http://localhost:3000/api/auth/permissions \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
-
-### 6. Logout
+### 5. Logout
 
 ```bash
 curl -X POST http://localhost:3000/api/auth/logout \
@@ -89,7 +82,7 @@ curl -X POST http://localhost:3000/api/auth/logout \
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "admin@inventory.com",
+    "username": "admin",
     "password": "admin123"
   }'
 ```
@@ -120,19 +113,6 @@ curl -X PUT http://localhost:3000/api/users/1 \
   }'
 ```
 
-### 5. Get All Permissions
-
-```bash
-curl -X GET http://localhost:3000/api/permissions \
-  -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
-```
-
-### 6. Get Permissions by Role
-
-```bash
-curl -X GET http://localhost:3000/api/permissions/role/manager \
-  -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
-```
 
 ## JavaScript/TypeScript Examples
 
@@ -349,7 +329,7 @@ export const useAuth = () => {
 // 403 Forbidden
 {
   "success": false,
-  "message": "Insufficient permissions. Required: users:create"
+  "message": "Admin access required"
 }
 
 // 400 Bad Request

@@ -50,7 +50,10 @@ export const resetDatabase = async (): Promise<void> => {
     console.log("⚠️  Resetting database...");
 
     // Drop tables in reverse order (to handle foreign key constraints)
+    await pool.query("DROP TABLE IF EXISTS role_permissions CASCADE");
+    await pool.query("DROP TABLE IF EXISTS permissions CASCADE");
     await pool.query("DROP TABLE IF EXISTS products CASCADE");
+    await pool.query("DROP TABLE IF EXISTS refresh_tokens CASCADE");
     await pool.query("DROP TABLE IF EXISTS users CASCADE");
     await pool.query(
       "DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE"

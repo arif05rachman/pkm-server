@@ -188,7 +188,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"Test123!@#\"\n}"
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"Test123!@#\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -225,7 +225,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@inventory.com\",\n  \"password\": \"admin123\"\n}"
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -372,36 +372,6 @@
               "raw": "{{baseUrl}}/auth/change-password",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "change-password"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get User Permissions",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('User permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('user');",
-                  "    pm.expect(jsonData.data).to.have.property('permissions');",
-                  "    pm.expect(jsonData.data.permissions).to.be.an('array');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/auth/permissions",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "permissions"]
             }
           },
           "response": []
@@ -584,36 +554,6 @@
           "response": []
         },
         {
-          "name": "Get User Permissions by ID",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('User permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('user');",
-                  "    pm.expect(jsonData.data).to.have.property('permissions');",
-                  "    pm.expect(jsonData.data.permissions).to.be.an('array');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/users/{{userId}}/permissions",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}", "permissions"]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Delete User",
           "event": [
             {
@@ -636,133 +576,6 @@
               "raw": "{{baseUrl}}/users/{{userId}}",
               "host": ["{{baseUrl}}"],
               "path": ["users", "{{userId}}"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Permission Management (Admin Only)",
-      "item": [
-        {
-          "name": "Get All Permissions",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.be.an('array');",
-                  "    pm.expect(jsonData.data.length).to.be.greaterThan(0);",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/permissions",
-              "host": ["{{baseUrl}}"],
-              "path": ["permissions"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Permissions by Role - Admin",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Admin permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('role');",
-                  "    pm.expect(jsonData.data).to.have.property('permissions');",
-                  "    pm.expect(jsonData.data.permissions).to.be.an('array');",
-                  "    pm.expect(jsonData.data.role).to.eql('admin');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/permissions/role/admin",
-              "host": ["{{baseUrl}}"],
-              "path": ["permissions", "role", "admin"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Permissions by Role - Manager",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('Manager permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('role');",
-                  "    pm.expect(jsonData.data).to.have.property('permissions');",
-                  "    pm.expect(jsonData.data.permissions).to.be.an('array');",
-                  "    pm.expect(jsonData.data.role).to.eql('manager');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/permissions/role/manager",
-              "host": ["{{baseUrl}}"],
-              "path": ["permissions", "role", "manager"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Permissions by Role - User",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('User permissions retrieved successfully', function () {",
-                  "    const jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "    pm.expect(jsonData.data).to.have.property('role');",
-                  "    pm.expect(jsonData.data).to.have.property('permissions');",
-                  "    pm.expect(jsonData.data.permissions).to.be.an('array');",
-                  "    pm.expect(jsonData.data.role).to.eql('user');",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/permissions/role/user",
-              "host": ["{{baseUrl}}"],
-              "path": ["permissions", "role", "user"]
             }
           },
           "response": []
@@ -873,7 +686,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"wrongpassword\"\n}"
+              "raw": "{\n  \"username\": \"testuser\",\n  \"password\": \"wrongpassword\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",

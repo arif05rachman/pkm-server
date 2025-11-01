@@ -8,7 +8,6 @@ import {
   refreshToken,
   logout,
   logoutAll,
-  getUserPermissions,
 } from "@/controllers/authController";
 import { authenticateToken } from "@/middleware/auth";
 import { asyncHandler } from "@/middleware/errorHandler";
@@ -23,7 +22,6 @@ router.post("/login", asyncHandler(login));
 router.get("/profile", authenticateToken, asyncHandler(getProfile));
 router.put("/profile", authenticateToken, asyncHandler(updateProfile));
 router.put("/change-password", authenticateToken, asyncHandler(changePassword));
-router.get("/permissions", authenticateToken, asyncHandler(getUserPermissions));
 router.post("/logout", asyncHandler(logout));
 router.post("/logout-all", authenticateToken, asyncHandler(logoutAll));
 

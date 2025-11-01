@@ -4,10 +4,9 @@ import {
   getUserById,
   updateUserById,
   deleteUserById,
-  getUserPermissionsById,
 } from "@/controllers/userController";
 import { authenticateToken } from "@/middleware/auth";
-import { requireAdmin, requirePermission } from "@/middleware/permissions";
+import { requireAdmin } from "@/middleware/permissions";
 import { asyncHandler } from "@/middleware/errorHandler";
 
 const router: Router = Router();
@@ -26,12 +25,5 @@ router.put("/:id", requireAdmin, asyncHandler(updateUserById));
 
 // Delete user by ID (admin only)
 router.delete("/:id", requireAdmin, asyncHandler(deleteUserById));
-
-// Get user permissions by ID (admin only)
-router.get(
-  "/:id/permissions",
-  requireAdmin,
-  asyncHandler(getUserPermissionsById)
-);
 
 export default router;

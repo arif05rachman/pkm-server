@@ -124,7 +124,6 @@ pnpm run lint:fix
 - `GET /api/auth/profile` - Get user profile (protected)
 - `PUT /api/auth/profile` - Update user profile (protected)
 - `PUT /api/auth/change-password` - Change password (protected)
-- `GET /api/auth/permissions` - Get user permissions (protected)
 
 ### User Management (Admin Only)
 
@@ -132,12 +131,6 @@ pnpm run lint:fix
 - `GET /api/users/:id` - Get user by ID
 - `PUT /api/users/:id` - Update user by ID
 - `DELETE /api/users/:id` - Delete user by ID
-- `GET /api/users/:id/permissions` - Get user permissions
-
-### Permission Management (Admin Only)
-
-- `GET /api/permissions` - Get all permissions
-- `GET /api/permissions/role/:role` - Get permissions by role
 
 ### Health Check
 
@@ -159,7 +152,6 @@ Authorization: Bearer <your-access-token>
 - **Access Token**: Short-lived (24 hours) for API requests
 - **Refresh Token**: Long-lived (7 days) for token renewal
 - **Role-based Access Control**: Admin, Manager, User roles
-- **Permission-based Authorization**: Granular resource permissions
 - **Session Management**: Logout from single or all devices
 
 ### Authentication Flow

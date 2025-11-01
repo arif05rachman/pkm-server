@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { UserModel } from "@/models/User";
 import { RefreshTokenModel } from "@/models/RefreshToken";
-import { PermissionModel } from "@/models/Permission";
 import { generateTokens, generateAccessTokenFromRefresh } from "@/utils/jwt";
 import { validatePasswordStrength } from "@/utils/bcrypt";
 import { asyncHandler, AppError } from "@/middleware/errorHandler";
@@ -12,7 +11,6 @@ import {
   ApiResponse,
   RefreshTokenRequest,
   RefreshTokenResponse,
-  UserPermissions,
 } from "@/types";
 import { config } from "@/config/env";
 
@@ -106,17 +104,16 @@ export const register = asyncHandler(
  */
 export const login = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const { email, password }: LoginRequest = req.body;
-
+    const { username, password }: LoginRequest = req.body;
     // Validate required fields
-    if (!email || !password) {
-      throw new AppError("Email and password are required", 400);
+    if (!username || !password) {
+      throw new AppError("username and password are required", 400);
     }
 
     // Verify user credentials
-    const user = await UserModel.verifyPassword(email, password);
+    const user = await UserModel.verifyPassword(username, password);
     if (!user) {
-      throw new AppError("Invalid email or password", 401);
+      throw new AppError("Invalid username or password", 401);
     }
 
     // Check if user is active
@@ -385,41 +382,6 @@ export const logoutAll = asyncHandler(
     res.json({
       success: true,
       message: "Logged out from all devices successfully",
-    });
-  }
-);
-
-/**
- * Get user permissions
- */
-export const getUserPermissions = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const userId = (req as any).user.id;
-
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    const permissions = await PermissionModel.getUserPermissions(user.role);
-
-    const response: UserPermissions = {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        is_active: user.is_active,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      },
-      permissions,
-    };
-
-    res.json({
-      success: true,
-      message: "User permissions retrieved successfully",
-      data: response,
     });
   }
 );

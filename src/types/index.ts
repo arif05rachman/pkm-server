@@ -20,7 +20,7 @@ export interface CreateUserRequest {
 }
 
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
@@ -37,21 +37,6 @@ export interface RefreshTokenRequest {
 export interface RefreshTokenResponse {
   token: string;
   refreshToken: string;
-}
-
-export interface Permission {
-  id: number;
-  name: string;
-  description: string;
-  resource: string;
-  action: string;
-  created_at: Date;
-  updated_at: Date;
-}
-
-export interface UserPermissions {
-  user: Omit<User, "password">;
-  permissions: Permission[];
 }
 
 // JWT Payload

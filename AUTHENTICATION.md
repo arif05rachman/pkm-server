@@ -134,13 +134,6 @@ Content-Type: application/json
 }
 ```
 
-#### Get User Permissions
-
-```http
-GET /api/auth/permissions
-Authorization: Bearer <access_token>
-```
-
 #### Logout All Devices
 
 ```http
@@ -186,63 +179,6 @@ DELETE /api/users/1
 Authorization: Bearer <admin_token>
 ```
 
-### Get User Permissions
-
-```http
-GET /api/users/1/permissions
-Authorization: Bearer <admin_token>
-```
-
-## 🔐 Permission Management (Admin Only)
-
-### Get All Permissions
-
-```http
-GET /api/permissions
-Authorization: Bearer <admin_token>
-```
-
-### Get Permissions by Role
-
-```http
-GET /api/permissions/role/admin
-Authorization: Bearer <admin_token>
-```
-
-## 🛡️ Permission System
-
-### Available Permissions
-
-| Permission       | Resource  | Action | Description             |
-| ---------------- | --------- | ------ | ----------------------- |
-| users.create     | users     | create | Create new users        |
-| users.read       | users     | read   | View user information   |
-| users.update     | users     | update | Update user information |
-| users.delete     | users     | delete | Delete users            |
-| products.create  | products  | create | Create products         |
-| products.read    | products  | read   | View products           |
-| products.update  | products  | update | Update products         |
-| products.delete  | products  | delete | Delete products         |
-| inventory.manage | inventory | manage | Manage inventory        |
-| reports.view     | reports   | view   | View reports            |
-| settings.manage  | settings  | manage | Manage system settings  |
-
-### Role Permissions
-
-#### Admin Role
-
-- **All permissions** - Full system access
-
-#### Manager Role
-
-- products.create, products.read, products.update, products.delete
-- inventory.manage
-- reports.view
-
-#### User Role
-
-- products.read - Read-only access to products
-
 ## 🔧 Middleware Usage
 
 ### Authentication Middleware
@@ -257,29 +193,13 @@ router.get("/protected", authenticateToken, handler);
 ### Authorization Middleware
 
 ```typescript
-import { requirePermission, requireAdmin } from "@/middleware/permissions";
-
-// Require specific permission
-router.post(
-  "/products",
-  authenticateToken,
-  requirePermission("products", "create"),
-  handler
-);
+import { requireAdmin, requireAdminOrManager } from "@/middleware/permissions";
 
 // Require admin role
 router.delete("/users/:id", authenticateToken, requireAdmin, handler);
 
-// Require any of multiple permissions
-router.get(
-  "/reports",
-  authenticateToken,
-  requireAnyPermission([
-    { resource: "reports", action: "view" },
-    { resource: "inventory", action: "manage" },
-  ]),
-  handler
-);
+// Require admin or manager role
+router.get("/reports", authenticateToken, requireAdminOrManager, handler);
 ```
 
 ## 🔒 Security Features
@@ -323,7 +243,7 @@ router.get(
 ```json
 {
   "success": false,
-  "message": "Insufficient permissions. Required: products:create"
+  "message": "Admin access required"
 }
 ```
 
@@ -416,31 +336,6 @@ CREATE TABLE refresh_tokens (
 );
 ```
 
-### Permissions Table
-
-```sql
-CREATE TABLE permissions (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    description TEXT,
-    resource VARCHAR(50) NOT NULL,
-    action VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### Role Permissions Table
-
-```sql
-CREATE TABLE role_permissions (
-    id SERIAL PRIMARY KEY,
-    role VARCHAR(20) NOT NULL,
-    permission_id INTEGER NOT NULL REFERENCES permissions(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(role, permission_id)
-);
-```
 
 ## 🧪 Testing
 
@@ -455,20 +350,16 @@ curl -X POST http://localhost:3000/api/auth/register \
 # Login
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com","password":"Test123!@#"}'
+  -d '{"username":"testuser","password":"Test123!@#"}'
 
 # Get Profile (use token from login response)
 curl -X GET http://localhost:3000/api/auth/profile \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### Test Permissions
+### Test Admin Routes
 
 ```bash
-# Get user permissions
-curl -X GET http://localhost:3000/api/auth/permissions \
-  -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-
 # Get all users (admin only)
 curl -X GET http://localhost:3000/api/users \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"

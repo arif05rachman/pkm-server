@@ -2,10 +2,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const DEFAULT_PORT = parseInt(process.env.PORT || "4000");
+
 export const config = {
   // Server Configuration
   NODE_ENV: process.env.NODE_ENV || "development",
-  PORT: parseInt(process.env.PORT || "3000"),
+  PORT: DEFAULT_PORT,
 
   // Database Configuration
   DB: {
@@ -25,7 +27,7 @@ export const config = {
 
   // CORS Configuration
   CORS: {
-    ORIGIN: process.env.CORS_ORIGIN || "http://localhost:3000",
+    ORIGIN: process.env.CORS_ORIGIN || `http://localhost:${DEFAULT_PORT}`,
   },
 
   // Rate Limiting

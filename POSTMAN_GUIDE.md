@@ -41,14 +41,11 @@ File collection Postman yang lengkap untuk testing API Inventory Management Syst
 1. **Register User** - Buat user baru
 2. **Login User** - Login dengan user yang baru dibuat
 3. **Get Profile** - Test protected endpoint
-4. **Get User Permissions** - Lihat permissions user
 
 ### Step 3: Admin Testing
 
-1. **Login Admin** - Login sebagai admin (admin@inventory.com / admin123)
+1. **Login Admin** - Login sebagai admin (username: admin / password: admin123)
 2. **Get All Users** - Test admin endpoint
-3. **Get All Permissions** - Lihat semua permissions
-4. **Get Permissions by Role** - Test role-based permissions
 
 ### Step 4: Error Testing
 
@@ -112,7 +109,6 @@ if (pm.response.json().success && pm.response.json().data) {
 - **Get Profile** - Get user profile (protected)
 - **Update Profile** - Update user profile (protected)
 - **Change Password** - Change password (protected)
-- **Get User Permissions** - Get user permissions (protected)
 - **Logout** - Logout (revoke refresh token)
 - **Logout All Devices** - Logout from all devices (protected)
 
@@ -121,17 +117,9 @@ if (pm.response.json().success && pm.response.json().data) {
 - **Get All Users** - Get paginated users list
 - **Get User by ID** - Get specific user
 - **Update User** - Update user information
-- **Get User Permissions by ID** - Get user permissions
 - **Delete User** - Delete user (soft delete)
 
-### 4. Permission Management (Admin Only)
-
-- **Get All Permissions** - Get all system permissions
-- **Get Permissions by Role - Admin** - Get admin permissions
-- **Get Permissions by Role - Manager** - Get manager permissions
-- **Get Permissions by Role - User** - Get user permissions
-
-### 5. Error Testing
+### 4. Error Testing
 
 - **Register with Invalid Email** - Test email validation
 - **Register with Weak Password** - Test password validation
@@ -148,8 +136,7 @@ if (pm.response.json().success && pm.response.json().data) {
 3. Get profile
 4. Update profile
 5. Change password
-6. Get permissions
-7. Logout
+6. Logout
 
 ### Scenario 2: Admin Management
 
@@ -157,9 +144,7 @@ if (pm.response.json().success && pm.response.json().data) {
 2. Get all users
 3. Get specific user
 4. Update user role
-5. Get user permissions
-6. Get all permissions
-7. Get permissions by role
+5. Delete user
 
 ### Scenario 3: Error Handling
 
@@ -225,13 +210,14 @@ Error: Token expired
 
 **Solution**: Use refresh token endpoint atau login ulang
 
-#### 4. Permission Denied
+#### 4. Access Denied
 
 ```
 Error: Insufficient permissions
+Error: Admin access required
 ```
 
-**Solution**: Login sebagai admin atau user dengan permission yang tepat
+**Solution**: Login sebagai admin untuk akses admin routes
 
 ### Debug Tips
 

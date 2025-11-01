@@ -35,14 +35,35 @@ CREATE TRIGGER update_users_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert default admin user (password: admin123)
+-- This will create admin user if it doesn't exist, or update if exists
 INSERT INTO users (username, email, password, role, is_active) 
 VALUES (
     'admin', 
     'admin@inventory.com', 
-    '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/8Qz8K2K', 
+    '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 
     'admin', 
     true
-) ON CONFLICT (email) DO NOTHING;
+) ON CONFLICT (username) 
+DO UPDATE SET 
+    email = EXCLUDED.email,
+    password = EXCLUDED.password,
+    role = EXCLUDED.role,
+    is_active = EXCLUDED.is_active,
+    updated_at = CURRENT_TIMESTAMP;
+
+-- Handle email conflict separately (in case email exists but username is different)
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM users WHERE email = 'admin@inventory.com' AND username != 'admin') THEN
+        UPDATE users 
+        SET username = 'admin',
+            password = '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW',
+            role = 'admin',
+            is_active = true,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE email = 'admin@inventory.com';
+    END IF;
+END $$;
 
 -- Create products table (example for inventory management)
 CREATE TABLE IF NOT EXISTS products (
@@ -94,65 +115,3 @@ CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id)
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);
 CREATE INDEX IF NOT EXISTS idx_refresh_tokens_is_revoked ON refresh_tokens(is_revoked);
-
--- Create permissions table
-CREATE TABLE IF NOT EXISTS permissions (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(100) UNIQUE NOT NULL,
-    description TEXT,
-    resource VARCHAR(50) NOT NULL,
-    action VARCHAR(50) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Create trigger for permissions updated_at
-CREATE TRIGGER update_permissions_updated_at 
-    BEFORE UPDATE ON permissions 
-    FOR EACH ROW 
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Create role_permissions table
-CREATE TABLE IF NOT EXISTS role_permissions (
-    id SERIAL PRIMARY KEY,
-    role VARCHAR(20) NOT NULL,
-    permission_id INTEGER NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(role, permission_id)
-);
-
--- Create indexes for permissions
-CREATE INDEX IF NOT EXISTS idx_permissions_resource ON permissions(resource);
-CREATE INDEX IF NOT EXISTS idx_permissions_action ON permissions(action);
-CREATE INDEX IF NOT EXISTS idx_role_permissions_role ON role_permissions(role);
-CREATE INDEX IF NOT EXISTS idx_role_permissions_permission_id ON role_permissions(permission_id);
-
--- Insert default permissions
-INSERT INTO permissions (name, description, resource, action) VALUES
-('users.create', 'Create users', 'users', 'create'),
-('users.read', 'Read users', 'users', 'read'),
-('users.update', 'Update users', 'users', 'update'),
-('users.delete', 'Delete users', 'users', 'delete'),
-('products.create', 'Create products', 'products', 'create'),
-('products.read', 'Read products', 'products', 'read'),
-('products.update', 'Update products', 'products', 'update'),
-('products.delete', 'Delete products', 'products', 'delete'),
-('inventory.manage', 'Manage inventory', 'inventory', 'manage'),
-('reports.view', 'View reports', 'reports', 'view'),
-('settings.manage', 'Manage settings', 'settings', 'manage')
-ON CONFLICT (name) DO NOTHING;
-
--- Assign permissions to roles
-INSERT INTO role_permissions (role, permission_id) 
-SELECT 'admin', p.id FROM permissions p
-ON CONFLICT (role, permission_id) DO NOTHING;
-
-INSERT INTO role_permissions (role, permission_id) 
-SELECT 'manager', p.id FROM permissions p 
-WHERE p.resource IN ('products', 'inventory', 'reports')
-ON CONFLICT (role, permission_id) DO NOTHING;
-
-INSERT INTO role_permissions (role, permission_id) 
-SELECT 'user', p.id FROM permissions p 
-WHERE p.resource = 'products' AND p.action = 'read'
-ON CONFLICT (role, permission_id) DO NOTHING;

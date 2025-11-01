@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import { UserModel } from "@/models/User";
-import { PermissionModel } from "@/models/Permission";
 import { asyncHandler, AppError } from "@/middleware/errorHandler";
-import { ApiResponse, UserPermissions, PaginatedResponse, User } from "@/types";
+import { ApiResponse, PaginatedResponse, User } from "@/types";
 
 /**
  * Get all users (admin only)
@@ -173,80 +172,3 @@ export const deleteUserById = asyncHandler(
   }
 );
 
-/**
- * Get user permissions by user ID (admin only)
- */
-export const getUserPermissionsById = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const userId = parseInt(req.params.id);
-
-    if (isNaN(userId)) {
-      throw new AppError("Invalid user ID", 400);
-    }
-
-    const user = await UserModel.findById(userId);
-    if (!user) {
-      throw new AppError("User not found", 404);
-    }
-
-    const permissions = await PermissionModel.getUserPermissions(user.role);
-
-    const response: UserPermissions = {
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        is_active: user.is_active,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-      },
-      permissions,
-    };
-
-    res.json({
-      success: true,
-      message: "User permissions retrieved successfully",
-      data: response,
-    });
-  }
-);
-
-/**
- * Get all permissions (admin only)
- */
-export const getAllPermissions = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const permissions = await PermissionModel.findAll();
-
-    res.json({
-      success: true,
-      message: "Permissions retrieved successfully",
-      data: permissions,
-    });
-  }
-);
-
-/**
- * Get permissions by role (admin only)
- */
-export const getPermissionsByRole = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const { role } = req.params;
-
-    if (!["admin", "manager", "user"].includes(role)) {
-      throw new AppError("Invalid role", 400);
-    }
-
-    const permissions = await PermissionModel.findByRole(role);
-
-    res.json({
-      success: true,
-      message: "Role permissions retrieved successfully",
-      data: {
-        role,
-        permissions,
-      },
-    });
-  }
-);

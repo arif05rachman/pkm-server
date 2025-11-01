@@ -140,10 +140,10 @@ export class UserModel {
    * Verify user password
    */
   static async verifyPassword(
-    email: string,
+    username: string,
     password: string
   ): Promise<User | null> {
-    const user = await this.findByEmail(email);
+    const user = await this.findByUsername(username);
 
     if (!user) {
       return null;
