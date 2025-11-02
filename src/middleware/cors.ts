@@ -15,7 +15,7 @@ export const corsOptions = {
     const allowedOrigins = [
       config.CORS.ORIGIN,
       `http://localhost:${config.PORT}`, // Match server port dynamically
-      "http://localhost:3000", // Common frontend port
+      "http://localhost:4000", // Common frontend port
       "http://localhost:3001",
       "http://localhost:5173", // Vite default port
       "http://localhost:8080", // Vue CLI default port

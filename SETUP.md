@@ -57,20 +57,20 @@ This will:
 pnpm run dev
 ```
 
-The server will start on `http://localhost:3000`
+The server will start on `http://localhost:4000`
 
 ## 🧪 Test the API
 
 ### Health Check
 
 ```bash
-curl http://localhost:3000/api/health
+curl http://localhost:4000/api/health
 ```
 
 ### Register a New User
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST http://localhost:4000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -82,7 +82,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ### Login
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -112,11 +112,11 @@ curl -X POST http://localhost:3000/api/auth/login \
 ### Port Already in Use
 
 - Change `PORT` in `.env` file
-- Kill existing processes on port 3000
+- Kill existing processes on port 4000
 
 ## 📚 Next Steps
 
-1. Explore the API documentation at `http://localhost:3000/api`
+1. Explore the API documentation at `http://localhost:4000/api`
 2. Check the project structure in `src/` directory
 3. Add your business logic in `src/controllers/`
 4. Create new models in `src/models/`

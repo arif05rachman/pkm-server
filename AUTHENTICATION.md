@@ -336,24 +336,23 @@ CREATE TABLE refresh_tokens (
 );
 ```
 
-
 ## 🧪 Testing
 
 ### Test Authentication
 
 ```bash
 # Register
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST http://localhost:4000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"username":"testuser","email":"test@example.com","password":"Test123!@#"}'
 
 # Login
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"username":"testuser","password":"Test123!@#"}'
 
 # Get Profile (use token from login response)
-curl -X GET http://localhost:3000/api/auth/profile \
+curl -X GET http://localhost:4000/api/auth/profile \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
@@ -361,7 +360,7 @@ curl -X GET http://localhost:3000/api/auth/profile \
 
 ```bash
 # Get all users (admin only)
-curl -X GET http://localhost:3000/api/users \
+curl -X GET http://localhost:4000/api/users \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
 ```
 

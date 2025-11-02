@@ -5,7 +5,7 @@
 ### 1. Register a New User
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST http://localhost:4000/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -17,7 +17,7 @@ curl -X POST http://localhost:3000/api/auth/register \
 ### 2. Login
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -50,14 +50,14 @@ curl -X POST http://localhost:3000/api/auth/login \
 ### 3. Get User Profile
 
 ```bash
-curl -X GET http://localhost:3000/api/auth/profile \
+curl -X GET http://localhost:4000/api/auth/profile \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
 ### 4. Refresh Token
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/refresh \
+curl -X POST http://localhost:4000/api/auth/refresh \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "a1b2c3d4e5f6..."
@@ -67,7 +67,7 @@ curl -X POST http://localhost:3000/api/auth/refresh \
 ### 5. Logout
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/logout \
+curl -X POST http://localhost:4000/api/auth/logout \
   -H "Content-Type: application/json" \
   -d '{
     "refreshToken": "a1b2c3d4e5f6..."
@@ -79,7 +79,7 @@ curl -X POST http://localhost:3000/api/auth/logout \
 ### 1. Login as Admin (Default Admin)
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST http://localhost:4000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "username": "admin",
@@ -90,21 +90,21 @@ curl -X POST http://localhost:3000/api/auth/login \
 ### 2. Get All Users
 
 ```bash
-curl -X GET "http://localhost:3000/api/users?page=1&limit=10" \
+curl -X GET "http://localhost:4000/api/users?page=1&limit=10" \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
 ```
 
 ### 3. Get User by ID
 
 ```bash
-curl -X GET http://localhost:3000/api/users/1 \
+curl -X GET http://localhost:4000/api/users/1 \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN"
 ```
 
 ### 4. Update User
 
 ```bash
-curl -X PUT http://localhost:3000/api/users/1 \
+curl -X PUT http://localhost:4000/api/users/1 \
   -H "Authorization: Bearer ADMIN_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -120,7 +120,7 @@ curl -X PUT http://localhost:3000/api/users/1 \
 
 ```typescript
 class AuthService {
-  private baseUrl = "http://localhost:3000/api";
+  private baseUrl = "http://localhost:4000/api";
 
   async login(email: string, password: string) {
     const response = await fetch(`${this.baseUrl}/auth/login`, {
@@ -381,7 +381,7 @@ const handleApiCall = async (apiCall: () => Promise<Response>) => {
 
 Create these variables in Postman:
 
-- `baseUrl`: `http://localhost:3000/api`
+- `baseUrl`: `http://localhost:4000/api`
 - `accessToken`: (set after login)
 - `refreshToken`: (set after login)
 
@@ -414,7 +414,7 @@ if (pm.response.json().success) {
 ```yaml
 # artillery.yml
 config:
-  target: "http://localhost:3000"
+  target: "http://localhost:4000"
   phases:
     - duration: 60
       arrivalRate: 10

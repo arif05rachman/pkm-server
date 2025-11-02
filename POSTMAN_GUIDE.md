@@ -27,7 +27,7 @@ File collection Postman yang lengkap untuk testing API Inventory Management Syst
 ### 3. Setup Environment
 
 1. Pilih environment **Inventory Development** di dropdown
-2. Pastikan server berjalan di `http://localhost:3000`
+2. Pastikan server berjalan di `http://localhost:4000`
 
 ## 🧪 Testing Workflow
 
@@ -119,7 +119,67 @@ if (pm.response.json().success && pm.response.json().data) {
 - **Update User** - Update user information
 - **Delete User** - Delete user (soft delete)
 
-### 4. Error Testing
+### 4. Karyawan Management (Admin Only)
+
+- **Get All Karyawan** - Get paginated karyawan list with filters
+- **Search Karyawan** - Search karyawan by name or NIP
+- **Get Karyawan by ID** - Get specific karyawan
+- **Create Karyawan** - Create new karyawan
+- **Update Karyawan** - Update karyawan information
+- **Delete Karyawan** - Soft delete karyawan
+- **Hard Delete Karyawan** - Permanently delete karyawan
+
+### 5. Barang Management (Admin Only)
+
+- **Get All Barang** - Get paginated barang list with filters (jenis, satuan)
+- **Search Barang** - Search barang by name or location
+- **Get Barang by ID** - Get specific barang
+- **Create Barang** - Create new barang
+- **Update Barang** - Update barang information
+- **Delete Barang** - Delete barang
+
+### 6. Supplier Management (Admin Only)
+
+- **Get All Supplier** - Get paginated supplier list
+- **Search Supplier** - Search supplier by name, alamat, or kontak
+- **Get Supplier by ID** - Get specific supplier
+- **Create Supplier** - Create new supplier
+- **Update Supplier** - Update supplier information
+- **Delete Supplier** - Delete supplier
+
+### 7. Transaksi Masuk (Admin Only)
+
+- **Get All Transaksi Masuk** - Get paginated transaksi masuk with filters
+- **Get Transaksi Masuk by ID** - Get transaksi masuk with details
+- **Create Transaksi Masuk** - Create transaksi masuk with details
+- **Update Transaksi Masuk** - Update transaksi masuk
+- **Delete Transaksi Masuk** - Delete transaksi masuk
+- **Add Detail Transaksi Masuk** - Add detail to existing transaksi
+- **Update Detail Transaksi Masuk** - Update detail transaksi masuk
+- **Delete Detail Transaksi Masuk** - Delete detail transaksi masuk
+
+### 8. Transaksi Keluar (Admin Only)
+
+- **Get All Transaksi Keluar** - Get paginated transaksi keluar with filters
+- **Get Transaksi Keluar by ID** - Get transaksi keluar with details
+- **Create Transaksi Keluar** - Create transaksi keluar with details
+- **Update Transaksi Keluar** - Update transaksi keluar
+- **Delete Transaksi Keluar** - Delete transaksi keluar
+- **Add Detail Transaksi Keluar** - Add detail to existing transaksi
+- **Update Detail Transaksi Keluar** - Update detail transaksi keluar
+- **Delete Detail Transaksi Keluar** - Delete detail transaksi keluar
+
+### 9. Log Activity (Admin Only)
+
+- **Get All Logs** - Get paginated logs with filters
+- **Search Logs** - Search logs by description or action
+- **Get Log by ID** - Get specific log
+- **Get Logs by User ID** - Get logs for specific user
+- **Get Log Statistics** - Get statistics by action type
+- **Create Log** - Create log activity (usually for internal use)
+- **Delete Old Logs** - Cleanup old logs
+
+### 10. Error Testing
 
 - **Register with Invalid Email** - Test email validation
 - **Register with Weak Password** - Test password validation
@@ -146,14 +206,33 @@ if (pm.response.json().success && pm.response.json().data) {
 4. Update user role
 5. Delete user
 
-### Scenario 3: Error Handling
+### Scenario 3: Inventory Management Flow
+
+1. Login as admin
+2. Create supplier
+3. Create barang
+4. Create transaksi masuk (with barang from supplier)
+5. Create transaksi keluar (distribute barang)
+6. Check logs for audit trail
+
+### Scenario 4: Complete Workflow
+
+1. Register karyawan
+2. Create user linked to karyawan
+3. Create barang
+4. Create supplier
+5. Record transaksi masuk
+6. Record transaksi keluar
+7. View activity logs
+
+### Scenario 5: Error Handling
 
 1. Try invalid registration
 2. Try wrong login
 3. Access protected route without token
 4. Access admin route as regular user
 
-### Scenario 4: Token Management
+### Scenario 6: Token Management
 
 1. Login user
 2. Use access token for API calls
@@ -189,7 +268,7 @@ Setiap request memiliki test assertions untuk:
 #### 1. Server Not Running
 
 ```
-Error: connect ECONNREFUSED 127.0.0.1:3000
+Error: connect ECONNREFUSED 127.0.0.1:4000
 ```
 
 **Solution**: Start server dengan `pnpm run dev`

@@ -8,7 +8,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api",
+      "value": "http://localhost:4000/api",
       "type": "string"
     },
     {
@@ -748,6 +748,652 @@
               "raw": "{{baseUrl}}/users",
               "host": ["{{baseUrl}}"],
               "path": ["users"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Karyawan Management (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Karyawan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/karyawan?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Karyawan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/karyawan/search?q=keyword",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "keyword"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Karyawan by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/karyawan/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Karyawan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_karyawan\": \"John Doe\",\n  \"jabatan\": \"Dokter\",\n  \"nip\": \"1234567890\",\n  \"no_hp\": \"081234567890\",\n  \"alamat\": \"Jl. Contoh No. 123\",\n  \"status_aktif\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/karyawan",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Karyawan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jabatan\": \"Dokter Spesialis\",\n  \"status_aktif\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/karyawan/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Karyawan",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/karyawan/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["karyawan", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Barang Management (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Barang",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/barang?page=1&limit=10&jenis=Obat",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "jenis",
+                  "value": "Obat"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Barang",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/barang/search?q=paracetamol",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "paracetamol"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Barang by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/barang/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Barang",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_barang\": \"Paracetamol 500mg\",\n  \"satuan\": \"tablet\",\n  \"jenis\": \"Obat\",\n  \"stok_minimal\": 100,\n  \"lokasi\": \"Gudang A\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/barang",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Barang",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stok_minimal\": 150,\n  \"lokasi\": \"Gudang B\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/barang/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Barang",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/barang/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["barang", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Supplier Management (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Supplier",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplier?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Supplier",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplier/search?q=pharma",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pharma"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Supplier by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplier/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Supplier",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_supplier\": \"PT. Farmasi Sejahtera\",\n  \"alamat\": \"Jl. Raya Jakarta No. 123\",\n  \"kontak\": \"021-12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/supplier",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Supplier",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kontak\": \"021-87654321\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/supplier/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Supplier",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/supplier/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["supplier", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transaksi Masuk (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Transaksi Masuk",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaksi Masuk by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaksi Masuk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tanggal_masuk\": \"2024-01-15\",\n  \"id_supplier\": 1,\n  \"keterangan\": \"Pembelian rutin bulanan\",\n  \"details\": [\n    {\n      \"id_barang\": 1,\n      \"jumlah\": 500,\n      \"harga_satuan\": 5000,\n      \"tanggal_kadaluarsa\": \"2025-12-31\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Transaksi Masuk",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keterangan\": \"Pembelian dengan diskon\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Transaksi Masuk",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Detail Transaksi Masuk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_barang\": 2,\n  \"jumlah\": 200,\n  \"harga_satuan\": 10000,\n  \"tanggal_kadaluarsa\": \"2025-06-30\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-masuk/1/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-masuk", "1", "details"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transaksi Keluar (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Transaksi Keluar",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-keluar?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-keluar"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Transaksi Keluar by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-keluar/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-keluar", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Transaksi Keluar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tanggal_keluar\": \"2024-01-20\",\n  \"tujuan\": \"Poli Umum\",\n  \"keterangan\": \"Distribusi ke poli\",\n  \"details\": [\n    {\n      \"id_barang\": 1,\n      \"jumlah\": 50\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-keluar",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-keluar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Transaksi Keluar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keterangan\": \"Distribusi darurat\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-keluar/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-keluar", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Transaksi Keluar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/transaksi-keluar/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["transaksi-keluar", "1"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Log Activity (Admin Only)",
+      "item": [
+        {
+          "name": "Get All Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs/search?q=LOGIN",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "LOGIN"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Log Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "statistics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Logs by User ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logs/user/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["logs", "user", "{{userId}}"]
             }
           },
           "response": []

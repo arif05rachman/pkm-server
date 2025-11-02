@@ -132,6 +132,66 @@ pnpm run lint:fix
 - `PUT /api/users/:id` - Update user by ID
 - `DELETE /api/users/:id` - Delete user by ID
 
+### Karyawan Management (Admin Only)
+
+- `GET /api/karyawan` - Get all karyawan with pagination
+- `GET /api/karyawan/search?q=term` - Search karyawan by name or NIP
+- `GET /api/karyawan/:id` - Get karyawan by ID
+- `POST /api/karyawan` - Create new karyawan
+- `PUT /api/karyawan/:id` - Update karyawan by ID
+- `DELETE /api/karyawan/:id` - Delete karyawan (soft delete)
+- `DELETE /api/karyawan/:id/hard` - Hard delete karyawan
+
+### Barang Management (Admin Only)
+
+- `GET /api/barang` - Get all barang with pagination (filter: `?jenis=Obat&satuan=pcs`)
+- `GET /api/barang/search?q=term` - Search barang by name or location
+- `GET /api/barang/:id` - Get barang by ID
+- `POST /api/barang` - Create new barang
+- `PUT /api/barang/:id` - Update barang by ID
+- `DELETE /api/barang/:id` - Delete barang
+
+### Supplier Management (Admin Only)
+
+- `GET /api/supplier` - Get all supplier with pagination
+- `GET /api/supplier/search?q=term` - Search supplier by name, alamat, or kontak
+- `GET /api/supplier/:id` - Get supplier by ID
+- `POST /api/supplier` - Create new supplier
+- `PUT /api/supplier/:id` - Update supplier by ID
+- `DELETE /api/supplier/:id` - Delete supplier
+
+### Transaksi Masuk (Admin Only)
+
+- `GET /api/transaksi-masuk` - Get all transaksi masuk with pagination (filter: `?startDate=...&endDate=...&id_supplier=...`)
+- `GET /api/transaksi-masuk/:id` - Get transaksi masuk by ID (with details)
+- `POST /api/transaksi-masuk` - Create transaksi masuk with details
+- `PUT /api/transaksi-masuk/:id` - Update transaksi masuk
+- `DELETE /api/transaksi-masuk/:id` - Delete transaksi masuk
+- `POST /api/transaksi-masuk/:id/details` - Add detail to transaksi masuk
+- `PUT /api/transaksi-masuk/:id/details/:detailId` - Update detail transaksi masuk
+- `DELETE /api/transaksi-masuk/:id/details/:detailId` - Delete detail transaksi masuk
+
+### Transaksi Keluar (Admin Only)
+
+- `GET /api/transaksi-keluar` - Get all transaksi keluar with pagination (filter: `?startDate=...&endDate=...&tujuan=...`)
+- `GET /api/transaksi-keluar/:id` - Get transaksi keluar by ID (with details)
+- `POST /api/transaksi-keluar` - Create transaksi keluar with details
+- `PUT /api/transaksi-keluar/:id` - Update transaksi keluar
+- `DELETE /api/transaksi-keluar/:id` - Delete transaksi keluar
+- `POST /api/transaksi-keluar/:id/details` - Add detail to transaksi keluar
+- `PUT /api/transaksi-keluar/:id/details/:detailId` - Update detail transaksi keluar
+- `DELETE /api/transaksi-keluar/:id/details/:detailId` - Delete detail transaksi keluar
+
+### Log Activity (Admin Only)
+
+- `GET /api/logs` - Get all logs with pagination (filter: `?id_user=...&aksi=...&startDate=...&endDate=...&ip_address=...`)
+- `GET /api/logs/search?q=term` - Search logs by description or action
+- `GET /api/logs/:id` - Get log by ID
+- `GET /api/logs/user/:userId` - Get logs by user ID
+- `GET /api/logs/statistics` - Get log statistics by action type
+- `POST /api/logs` - Create log activity (usually for internal use)
+- `DELETE /api/logs/cleanup?daysOld=90` - Delete old logs
+
 ### Health Check
 
 - `GET /api/health` - Server health status
@@ -179,23 +239,91 @@ See [AUTHENTICATION.md](./AUTHENTICATION.md) for detailed documentation.
 - `password` - Hashed password
 - `role` - User role (admin, user, manager)
 - `is_active` - Account status
+- `id_karyawan` - Foreign key to karyawan (nullable)
 - `created_at` - Creation timestamp
 - `updated_at` - Last update timestamp
 
-### Products Table (Example)
+### Karyawan Table
 
-- `id` - Primary key
-- `name` - Product name
-- `description` - Product description
-- `sku` - Stock keeping unit
-- `price` - Product price
-- `stock_quantity` - Current stock
-- `min_stock_level` - Minimum stock threshold
-- `category` - Product category
-- `is_active` - Product status
-- `created_by` - User who created the product
+- `id_karyawan` - Primary key
+- `nama_karyawan` - Full name
+- `jabatan` - Job position
+- `nip` - Employee ID number (unique, nullable)
+- `no_hp` - Phone number (nullable)
+- `alamat` - Address (nullable)
+- `status_aktif` - Active status
 - `created_at` - Creation timestamp
 - `updated_at` - Last update timestamp
+
+### Barang Table
+
+- `id_barang` - Primary key
+- `nama_barang` - Item name
+- `satuan` - Unit (pcs, botol, tablet)
+- `jenis` - Type (Obat, Alkes, BMHP)
+- `stok_minimal` - Minimum stock level
+- `lokasi` - Storage location (nullable)
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Supplier Table
+
+- `id_supplier` - Primary key
+- `nama_supplier` - Company name
+- `alamat` - Address (nullable)
+- `kontak` - Phone/email (nullable)
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Transaksi Masuk Table
+
+- `id_transaksi_masuk` - Primary key
+- `tanggal_masuk` - Receipt date
+- `id_supplier` - Foreign key to supplier (nullable)
+- `id_user` - Foreign key to users (nullable)
+- `keterangan` - Notes (nullable)
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Detail Transaksi Masuk Table
+
+- `id_detail_masuk` - Primary key
+- `id_transaksi_masuk` - Foreign key to transaksi_masuk
+- `id_barang` - Foreign key to barang
+- `jumlah` - Quantity received
+- `harga_satuan` - Unit price
+- `tanggal_kadaluarsa` - Expiration date (nullable)
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Transaksi Keluar Table
+
+- `id_transaksi_keluar` - Primary key
+- `tanggal_keluar` - Outgoing date
+- `tujuan` - Destination/receiver name
+- `id_user` - Foreign key to users (nullable)
+- `keterangan` - Notes (nullable)
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Detail Transaksi Keluar Table
+
+- `id_detail_keluar` - Primary key
+- `id_transaksi_keluar` - Foreign key to transaksi_keluar
+- `id_barang` - Foreign key to barang
+- `jumlah` - Quantity sent
+- `created_at` - Creation timestamp
+- `updated_at` - Last update timestamp
+
+### Log Activity Table
+
+- `id_log` - Primary key
+- `id_user` - Foreign key to users (nullable)
+- `waktu` - Activity timestamp
+- `aksi` - Action type (LOGIN, INSERT, UPDATE, DELETE, CETAK, etc.)
+- `deskripsi` - Activity description (nullable)
+- `ip_address` - User IP address (nullable)
+- `created_at` - Creation timestamp
 
 ## 🔧 Configuration
 
