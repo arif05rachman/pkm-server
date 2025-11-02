@@ -58,6 +58,7 @@ export const register = asyncHandler(
       email,
       password,
       role: role || "user",
+      id_karyawan: req.body.id_karyawan,
     });
 
     // Generate tokens
@@ -84,6 +85,7 @@ export const register = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
+        id_karyawan: user.id_karyawan,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -145,6 +147,7 @@ export const login = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
+        id_karyawan: user.id_karyawan,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -181,6 +184,7 @@ export const getProfile = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
+        id_karyawan: user.id_karyawan,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -244,6 +248,7 @@ export const updateProfile = asyncHandler(
         email: updatedUser.email,
         role: updatedUser.role,
         is_active: updatedUser.is_active,
+        id_karyawan: updatedUser.id_karyawan,
         created_at: updatedUser.created_at,
         updated_at: updatedUser.updated_at,
       },
