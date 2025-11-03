@@ -322,3 +322,143 @@ CREATE INDEX IF NOT EXISTS idx_log_activity_user ON log_activity(id_user);
 CREATE INDEX IF NOT EXISTS idx_log_activity_waktu ON log_activity(waktu);
 CREATE INDEX IF NOT EXISTS idx_log_activity_aksi ON log_activity(aksi);
 CREATE INDEX IF NOT EXISTS idx_log_activity_ip ON log_activity(ip_address);
+
+-- ============================================
+-- INITIAL DATA
+-- ============================================
+
+-- Insert sample karyawan data
+INSERT INTO karyawan (nama_karyawan, jabatan, nip, no_hp, alamat, status_aktif) VALUES
+('Dr. Ahmad Hidayat', 'Dokter Umum', '196501011990011001', '081234567890', 'Jl. Raya Puskesmas No. 1, Jakarta', true),
+('Siti Nurhaliza', 'Bidan', '197502021995022002', '081234567891', 'Jl. Merdeka No. 10, Jakarta', true),
+('Budi Santoso', 'Perawat', '198503031998033003', '081234567892', 'Jl. Sudirman No. 20, Jakarta', true),
+('Dewi Sartika', 'Admin', '199504041999044004', '081234567893', 'Jl. Thamrin No. 30, Jakarta', true),
+('Muhammad Rizki', 'Petugas Farmasi', '199605052000055005', '081234567894', 'Jl. Gatot Subroto No. 40, Jakarta', true)
+ON CONFLICT (nip) DO NOTHING;
+
+-- Update admin user with karyawan reference
+UPDATE users SET id_karyawan = (SELECT id_karyawan FROM karyawan WHERE nip = '196501011990011001' LIMIT 1) 
+WHERE username = 'admin' AND id_karyawan IS NULL;
+
+-- Insert additional sample users
+INSERT INTO users (username, email, password, role, id_karyawan, is_active) VALUES
+('dokter.ahmad', 'ahmad.hidayat@puskesmas.go.id', '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 'user', (SELECT id_karyawan FROM karyawan WHERE nip = '196501011990011001' LIMIT 1), true),
+('bidan.siti', 'siti.nurhaliza@puskesmas.go.id', '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 'user', (SELECT id_karyawan FROM karyawan WHERE nip = '197502021995022002' LIMIT 1), true),
+('perawat.budi', 'budi.santoso@puskesmas.go.id', '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 'manager', (SELECT id_karyawan FROM karyawan WHERE nip = '198503031998033003' LIMIT 1), true)
+ON CONFLICT (username) DO NOTHING;
+
+-- Insert sample barang data
+INSERT INTO barang (nama_barang, satuan, jenis, stok_minimal, lokasi) VALUES
+('Paracetamol 500mg', 'tablet', 'Obat', 500, 'Gudang A - Rak 1'),
+('Amoxicillin 500mg', 'tablet', 'Obat', 300, 'Gudang A - Rak 2'),
+('Antasida DOEN', 'tablet', 'Obat', 200, 'Gudang A - Rak 3'),
+('Albumin 20%', 'botol', 'Obat', 50, 'Gudang B - Kulkas'),
+('Infus NaCl 0.9%', 'botol', 'Obat', 200, 'Gudang B - Rak 4'),
+('Masker Bedah', 'pcs', 'Alkes', 1000, 'Gudang C - Rak 5'),
+('Sarung Tangan Lateks', 'pcs', 'Alkes', 500, 'Gudang C - Rak 6'),
+('Suntik 3ml', 'pcs', 'Alkes', 300, 'Gudang C - Rak 7'),
+('Suntik 5ml', 'pcs', 'Alkes', 300, 'Gudang C - Rak 7'),
+('Alkohol 70%', 'botol', 'BMHP', 100, 'Gudang D - Rak 8'),
+('Betadine', 'botol', 'BMHP', 150, 'Gudang D - Rak 9'),
+('Kapas Steril', 'pcs', 'BMHP', 500, 'Gudang D - Rak 10'),
+('Kassa Steril', 'pcs', 'BMHP', 300, 'Gudang D - Rak 10')
+ON CONFLICT DO NOTHING;
+
+-- Insert sample supplier data
+INSERT INTO supplier (nama_supplier, alamat, kontak) VALUES
+('PT. Farmasi Sejahtera', 'Jl. Industri No. 100, Jakarta Barat', '021-12345678'),
+('CV. Medika Utama', 'Jl. Perdagangan No. 200, Jakarta Utara', '021-87654321'),
+('PT. Kesehatan Indonesia', 'Jl. Bisnis No. 300, Jakarta Selatan', '021-11223344'),
+('UD. Alat Kesehatan', 'Jl. Pasar No. 400, Jakarta Timur', '021-99887766'),
+('PT. Bahan Medis', 'Jl. Distribusi No. 500, Bekasi', '021-55443322')
+ON CONFLICT DO NOTHING;
+
+-- Insert sample transaksi masuk
+INSERT INTO transaksi_masuk (tanggal_masuk, id_supplier, id_user, keterangan) VALUES
+(CURRENT_DATE - INTERVAL '30 days', (SELECT id_supplier FROM supplier WHERE nama_supplier = 'PT. Farmasi Sejahtera' LIMIT 1), (SELECT id FROM users WHERE username = 'admin' LIMIT 1), 'Pembelian rutin bulanan'),
+(CURRENT_DATE - INTERVAL '15 days', (SELECT id_supplier FROM supplier WHERE nama_supplier = 'CV. Medika Utama' LIMIT 1), (SELECT id FROM users WHERE username = 'admin' LIMIT 1), 'Stock replenishment'),
+(CURRENT_DATE - INTERVAL '5 days', (SELECT id_supplier FROM supplier WHERE nama_supplier = 'PT. Kesehatan Indonesia' LIMIT 1), (SELECT id FROM users WHERE username = 'admin' LIMIT 1), 'Pembelian darurat')
+ON CONFLICT DO NOTHING;
+
+-- Insert sample detail transaksi masuk
+-- Get transaction IDs using subquery with MIN/MAX to ensure we get the right ones
+INSERT INTO detail_transaksi_masuk (id_transaksi_masuk, id_barang, jumlah, harga_satuan, tanggal_kadaluarsa)
+SELECT 
+  tm.id_transaksi_masuk,
+  b.id_barang,
+  CASE 
+    WHEN b.nama_barang = 'Paracetamol 500mg' THEN 1000
+    WHEN b.nama_barang = 'Amoxicillin 500mg' THEN 500
+    WHEN b.nama_barang = 'Masker Bedah' THEN 2000
+    WHEN b.nama_barang = 'Sarung Tangan Lateks' THEN 1000
+    WHEN b.nama_barang = 'Albumin 20%' THEN 20
+    WHEN b.nama_barang = 'Infus NaCl 0.9%' THEN 300
+    WHEN b.nama_barang = 'Alkohol 70%' THEN 50
+  END as jumlah,
+  CASE 
+    WHEN b.nama_barang = 'Paracetamol 500mg' THEN 500
+    WHEN b.nama_barang = 'Amoxicillin 500mg' THEN 750
+    WHEN b.nama_barang = 'Masker Bedah' THEN 2000
+    WHEN b.nama_barang = 'Sarung Tangan Lateks' THEN 1500
+    WHEN b.nama_barang = 'Albumin 20%' THEN 250000
+    WHEN b.nama_barang = 'Infus NaCl 0.9%' THEN 15000
+    WHEN b.nama_barang = 'Alkohol 70%' THEN 25000
+  END as harga_satuan,
+  CASE 
+    WHEN b.nama_barang = 'Paracetamol 500mg' AND tm.tanggal_masuk = (SELECT MIN(tanggal_masuk) FROM transaksi_masuk) THEN CURRENT_DATE + INTERVAL '2 years'
+    WHEN b.nama_barang = 'Amoxicillin 500mg' THEN CURRENT_DATE + INTERVAL '1 year'
+    WHEN b.nama_barang = 'Albumin 20%' THEN CURRENT_DATE + INTERVAL '6 months'
+    WHEN b.nama_barang = 'Infus NaCl 0.9%' THEN CURRENT_DATE + INTERVAL '1 year'
+    WHEN b.nama_barang = 'Alkohol 70%' THEN CURRENT_DATE + INTERVAL '3 years'
+    ELSE NULL
+  END as tanggal_kadaluarsa
+FROM transaksi_masuk tm
+CROSS JOIN barang b
+WHERE 
+  (tm.tanggal_masuk = (SELECT MIN(tanggal_masuk) FROM transaksi_masuk) AND b.nama_barang IN ('Paracetamol 500mg', 'Amoxicillin 500mg'))
+  OR (tm.tanggal_masuk = (SELECT tanggal_masuk FROM transaksi_masuk ORDER BY tanggal_masuk OFFSET 1 LIMIT 1) AND b.nama_barang IN ('Masker Bedah', 'Sarung Tangan Lateks'))
+  OR (tm.tanggal_masuk = (SELECT MAX(tanggal_masuk) FROM transaksi_masuk) AND b.nama_barang IN ('Albumin 20%', 'Infus NaCl 0.9%', 'Alkohol 70%'))
+ON CONFLICT DO NOTHING;
+
+-- Insert sample transaksi keluar
+INSERT INTO transaksi_keluar (tanggal_keluar, tujuan, id_user, keterangan) VALUES
+(CURRENT_DATE - INTERVAL '20 days', 'Poli Umum', (SELECT id FROM users WHERE username = 'perawat.budi' LIMIT 1), 'Distribusi rutin ke poli'),
+(CURRENT_DATE - INTERVAL '10 days', 'Poli KIA', (SELECT id FROM users WHERE username = 'bidan.siti' LIMIT 1), 'Distribusi ke poli KIA'),
+(CURRENT_DATE - INTERVAL '3 days', 'UGD', (SELECT id FROM users WHERE username = 'admin' LIMIT 1), 'Distribusi darurat ke UGD')
+ON CONFLICT DO NOTHING;
+
+-- Insert sample detail transaksi keluar
+INSERT INTO detail_transaksi_keluar (id_transaksi_keluar, id_barang, jumlah)
+SELECT 
+  tk.id_transaksi_keluar,
+  b.id_barang,
+  CASE 
+    WHEN b.nama_barang = 'Paracetamol 500mg' THEN 200
+    WHEN b.nama_barang = 'Amoxicillin 500mg' THEN 100
+    WHEN b.nama_barang = 'Antasida DOEN' THEN 50
+    WHEN b.nama_barang = 'Suntik 3ml' THEN 100
+    WHEN b.nama_barang = 'Infus NaCl 0.9%' THEN 50
+    WHEN b.nama_barang = 'Masker Bedah' THEN 200
+    WHEN b.nama_barang = 'Sarung Tangan Lateks' THEN 150
+  END as jumlah
+FROM transaksi_keluar tk
+CROSS JOIN barang b
+WHERE 
+  (tk.tanggal_keluar = (SELECT MIN(tanggal_keluar) FROM transaksi_keluar) AND b.nama_barang IN ('Paracetamol 500mg', 'Amoxicillin 500mg'))
+  OR (tk.tanggal_keluar = (SELECT tanggal_keluar FROM transaksi_keluar ORDER BY tanggal_keluar OFFSET 1 LIMIT 1) AND b.nama_barang IN ('Antasida DOEN', 'Suntik 3ml'))
+  OR (tk.tanggal_keluar = (SELECT MAX(tanggal_keluar) FROM transaksi_keluar) AND b.nama_barang IN ('Infus NaCl 0.9%', 'Masker Bedah', 'Sarung Tangan Lateks'))
+ON CONFLICT DO NOTHING;
+
+-- Insert sample log activity
+INSERT INTO log_activity (id_user, waktu, aksi, deskripsi, ip_address) VALUES
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '1 hour', 'LOGIN', 'User admin berhasil login', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '2 hours', 'INSERT', 'Barang baru ditambahkan: Paracetamol 500mg', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '3 hours', 'INSERT', 'Supplier baru ditambahkan: PT. Farmasi Sejahtera', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'perawat.budi' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '4 hours', 'LOGIN', 'User perawat.budi berhasil login', '192.168.1.100'),
+((SELECT id FROM users WHERE username = 'perawat.budi' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '5 hours', 'INSERT', 'Transaksi keluar dibuat untuk Poli Umum', '192.168.1.100'),
+((SELECT id FROM users WHERE username = 'bidan.siti' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '6 hours', 'LOGIN', 'User bidan.siti berhasil login', '192.168.1.101'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '7 hours', 'UPDATE', 'Data karyawan diupdate: Dr. Ahmad Hidayat', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '8 hours', 'INSERT', 'Transaksi masuk baru dibuat', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '1 day', 'CETAK', 'Laporan stok barang dicetak', '127.0.0.1'),
+((SELECT id FROM users WHERE username = 'admin' LIMIT 1), CURRENT_TIMESTAMP - INTERVAL '2 days', 'INSERT', 'Karyawan baru ditambahkan: Muhammad Rizki', '127.0.0.1')
+ON CONFLICT DO NOTHING;
