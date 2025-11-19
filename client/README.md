@@ -56,12 +56,55 @@ src/
 │   ├── dashboard/    # Dashboard
 │   ├── barang/       # Barang management
 │   ├── karyawan/     # Karyawan management
+│   │   ├── KaryawanList.tsx    # Main list component
+│   │   ├── KaryawanModal.tsx   # Modal component
+│   │   └── useKaryawan.ts      # Custom hook for logic
 │   ├── supplier/     # Supplier management
 │   └── profile/      # User profile
 ├── types/            # TypeScript types
 ├── utils/            # Utility functions
 └── App.tsx           # Main app component
 ```
+
+## 🔗 Path Aliases
+
+Project menggunakan path aliases dengan awalan `@` untuk memudahkan import. Semua alias dikonfigurasi di `vite.config.ts` dan `tsconfig.app.json`.
+
+### Daftar Alias
+
+| Alias | Path | Contoh Penggunaan |
+|-------|------|-------------------|
+| `@` | `src` | `import { something } from '@/utils/theme'` |
+| `@pages` | `src/pages` | `import Login from '@pages/auth/Login'` |
+| `@components` | `src/components` | `import Layout from '@components/layout/DashboardLayout'` |
+| `@api` | `src/api` | `import { authApi } from '@api/auth'` |
+| `@contexts` | `src/contexts` | `import { useAuth } from '@contexts/AuthContext'` |
+| `@types` | `src/types` | `import type { User } from '@types'` |
+| `@utils` | `src/utils` | `import { formatDate } from '@utils/formatters'` |
+| `@hooks` | `src/hooks` | `import { useCustom } from '@hooks/useCustom'` |
+| `@assets` | `src/assets` | `import logo from '@assets/logo.svg'` |
+
+### Contoh Penggunaan
+
+**Sebelum (relative path):**
+```typescript
+import { useAuth } from "../../contexts/AuthContext";
+import type { Karyawan } from "../../types";
+import { karyawanApi } from "../../api/karyawan";
+```
+
+**Sesudah (dengan alias):**
+```typescript
+import { useAuth } from "@contexts/AuthContext";
+import type { Karyawan } from "@types";
+import { karyawanApi } from "@api/karyawan";
+```
+
+**Keuntungan:**
+- ✅ Lebih mudah dibaca dan dipahami
+- ✅ Tidak perlu menghitung `../` untuk relative paths
+- ✅ Lebih mudah di-refactor saat struktur folder berubah
+- ✅ Konsisten di seluruh project
 
 ## 🔐 Authentication
 

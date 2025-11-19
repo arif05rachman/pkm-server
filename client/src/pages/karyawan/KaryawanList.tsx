@@ -1,93 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Button,
   Space,
   Input,
-  Modal,
   Form,
-  App,
   Popconfirm,
   Typography,
   Tag,
   Row,
   Col,
   Card,
-  Switch,
 } from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   ReloadOutlined,
-  UserOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { karyawanApi } from "../../api/karyawan";
-import type { Karyawan } from "../../types";
+import { useKaryawan } from "./useKaryawan";
+import KaryawanModal from "./KaryawanModal";
+import type { Karyawan } from "@/types";
 import type { ColumnsType } from "antd/es/table";
 
 const { Title } = Typography;
-const { TextArea } = Input;
-const { useApp } = App;
 
 const KaryawanList: React.FC = () => {
-  const [karyawan, setKaryawan] = useState<Karyawan[]>([]);
-  const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Karyawan | null>(null);
   const [form] = Form.useForm();
-  const { message } = useApp();
-  const [searchValue, setSearchValue] = useState("");
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
 
-  useEffect(() => {
-    fetchData();
-  }, [pagination.current, pagination.pageSize]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const data = await karyawanApi.getAll(
-        pagination.current,
-        pagination.pageSize
-      );
-      setKaryawan(data.data);
-      setPagination((prev) => ({
-        ...prev,
-        total: data.pagination.total,
-      }));
-    } catch (error) {
-      message.error("Gagal memuat data karyawan");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = async (value: string) => {
-    if (!value) {
-      fetchData();
-      return;
-    }
-    setLoading(true);
-    try {
-      const data = await karyawanApi.search(value, 1, pagination.pageSize);
-      setKaryawan(data.data);
-      setPagination((prev) => ({
-        ...prev,
-        current: 1,
-        total: data.pagination.total,
-      }));
-    } catch (error) {
-      message.error("Gagal mencari karyawan");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const {
+    karyawan,
+    loading,
+    pagination,
+    searchValue,
+    setSearchValue,
+    fetchData,
+    handleSearch,
+    handleDelete,
+    handleSubmit,
+    setPagination,
+  } = useKaryawan();
 
   const handleAdd = () => {
     setEditingItem(null);
@@ -101,32 +56,15 @@ const KaryawanList: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await karyawanApi.delete(id);
-      message.success("Karyawan berhasil dihapus");
-      fetchData();
-    } catch (error) {
-      message.error("Gagal menghapus karyawan");
-    }
+  const handleModalSubmit = async (
+    values: Parameters<typeof handleSubmit>[0]
+  ) => {
+    return await handleSubmit(values, editingItem);
   };
 
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      if (editingItem) {
-        await karyawanApi.update(editingItem.id_karyawan, values);
-        message.success("Karyawan berhasil diupdate");
-      } else {
-        await karyawanApi.create(values);
-        message.success("Karyawan berhasil ditambahkan");
-      }
-      setModalVisible(false);
-      form.resetFields();
-      fetchData();
-    } catch (error: any) {
-      message.error(error.response?.data?.message || "Gagal menyimpan data");
-    }
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    form.resetFields();
   };
 
   const columns: ColumnsType<Karyawan> = [
@@ -163,7 +101,7 @@ const KaryawanList: React.FC = () => {
     {
       title: "Aksi",
       key: "action",
-      render: (_: any, record: Karyawan) => (
+      render: (_: unknown, record: Karyawan) => (
         <Space size="middle">
           <Button
             type="primary"
@@ -244,65 +182,17 @@ const KaryawanList: React.FC = () => {
               }));
             },
           }}
+          scroll={{ x: "max-content" }}
         />
       </Card>
 
-      <Modal
-        title={editingItem ? "Edit Karyawan" : "Tambah Karyawan"}
+      <KaryawanModal
         open={modalVisible}
-        onOk={handleSubmit}
-        onCancel={() => {
-          setModalVisible(false);
-          form.resetFields();
-        }}
-        width={700}
-      >
-        <Form form={form} layout="vertical">
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item
-                name="nama_karyawan"
-                label="Nama Karyawan"
-                rules={[
-                  { required: true, message: "Nama karyawan wajib diisi" },
-                ]}
-              >
-                <Input prefix={<UserOutlined />} placeholder="Nama Karyawan" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item
-                name="jabatan"
-                label="Jabatan"
-                rules={[{ required: true, message: "Jabatan wajib diisi" }]}
-              >
-                <Input placeholder="Jabatan" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col span={12}>
-              <Form.Item name="nip" label="NIP">
-                <Input placeholder="NIP" />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Form.Item name="no_hp" label="No. HP">
-                <Input placeholder="No. HP" />
-              </Form.Item>
-            </Col>
-          </Row>
-
-          <Form.Item name="alamat" label="Alamat">
-            <TextArea rows={3} placeholder="Alamat" />
-          </Form.Item>
-
-          <Form.Item name="status_aktif" label="Status" initialValue={true}>
-            <Switch checkedChildren="Aktif" unCheckedChildren="Tidak Aktif" />
-          </Form.Item>
-        </Form>
-      </Modal>
+        editingItem={editingItem}
+        onCancel={handleModalCancel}
+        onSubmit={handleModalSubmit}
+        form={form}
+      />
     </div>
   );
 };

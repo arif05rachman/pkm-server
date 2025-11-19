@@ -15,6 +15,7 @@ import LogActivityList from "./pages/logActivity/LogActivityList";
 import TransaksiMasukList from "./pages/transaksi/TransaksiMasukList";
 import TransaksiKeluarList from "./pages/transaksi/TransaksiKeluarList";
 import Profile from "./pages/profile/Profile";
+import NotFound from "./pages/NotFound";
 import "dayjs/locale/id";
 import "@ant-design/v5-patch-for-react-19";
 
@@ -30,6 +31,16 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ textAlign: "center", padding: 50 }}>Loading...</div>;
+  }
+
+  return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
+};
+
 const App: React.FC = () => {
   return (
     <ConfigProvider theme={defaultTheme}>
@@ -37,8 +48,23 @@ const App: React.FC = () => {
         <AuthProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                }
+              />
+              <Route path="/404" element={<NotFound />} />
               <Route
                 path="/dashboard"
                 element={
@@ -64,6 +90,7 @@ const App: React.FC = () => {
                 <Route path="profile" element={<Profile />} />
               </Route>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/404" replace />} />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

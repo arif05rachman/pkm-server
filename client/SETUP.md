@@ -106,6 +106,9 @@ client/
 │   │   ├── dashboard/    # Dashboard
 │   │   ├── barang/       # Barang management
 │   │   ├── karyawan/     # Karyawan management
+│   │   │   ├── KaryawanList.tsx    # Main list component
+│   │   │   ├── KaryawanModal.tsx   # Modal component
+│   │   │   └── useKaryawan.ts      # Custom hook for logic
 │   │   ├── supplier/     # Supplier management
 │   │   └── profile/      # User profile
 │   ├── types/            # TypeScript types
@@ -117,6 +120,55 @@ client/
 ├── .env.example          # Example env file
 └── package.json
 ```
+
+## 🔗 Path Aliases
+
+Project menggunakan path aliases dengan awalan `@` untuk memudahkan import. Konfigurasi ada di `vite.config.ts` dan `tsconfig.app.json`.
+
+### Daftar Alias yang Tersedia
+
+| Alias | Path | Contoh |
+|-------|------|--------|
+| `@` | `src` | `@/utils/theme` |
+| `@pages` | `src/pages` | `@pages/auth/Login` |
+| `@components` | `src/components` | `@components/layout/DashboardLayout` |
+| `@api` | `src/api` | `@api/auth` |
+| `@contexts` | `src/contexts` | `@contexts/AuthContext` |
+| `@types` | `src/types` | `@types` |
+| `@utils` | `src/utils` | `@utils/formatters` |
+| `@hooks` | `src/hooks` | `@hooks/useCustom` |
+| `@assets` | `src/assets` | `@assets/logo.svg` |
+
+### Contoh Penggunaan
+
+**Menggunakan alias:**
+```typescript
+// Import dari contexts
+import { useAuth } from "@contexts/AuthContext";
+
+// Import types
+import type { User, Karyawan } from "@types";
+
+// Import API
+import { authApi, karyawanApi } from "@api/auth";
+
+// Import pages
+import Login from "@pages/auth/Login";
+import Dashboard from "@pages/dashboard/Dashboard";
+
+// Import components
+import DashboardLayout from "@components/layout/DashboardLayout";
+
+// Import utils
+import { formatDate } from "@utils/formatters";
+import { defaultTheme } from "@utils/theme";
+```
+
+**Keuntungan:**
+- Tidak perlu menghitung `../` untuk relative paths
+- Lebih mudah dibaca dan dipahami
+- Lebih mudah di-refactor saat struktur folder berubah
+- Konsisten di seluruh project
 
 ## 🔐 Authentication Flow
 
