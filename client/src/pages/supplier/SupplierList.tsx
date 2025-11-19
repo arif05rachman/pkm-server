@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -6,13 +6,13 @@ import {
   Input,
   Modal,
   Form,
-  message,
+  App,
   Popconfirm,
   Typography,
   Row,
   Col,
   Card,
-} from 'antd';
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
@@ -21,14 +21,15 @@ import {
   ShopOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
-} from '@ant-design/icons';
-import { supplierApi } from '../../api/supplier';
-import type { Supplier } from '../../types';
-import type { ColumnsType } from 'antd/es/table';
+  SearchOutlined,
+} from "@ant-design/icons";
+import { supplierApi } from "../../api/supplier";
+import type { Supplier } from "../../types";
+import type { ColumnsType } from "antd/es/table";
 
 const { Title } = Typography;
-const { Search } = Input;
 const { TextArea } = Input;
+const { useApp } = App;
 
 const SupplierList: React.FC = () => {
   const [supplier, setSupplier] = useState<Supplier[]>([]);
@@ -36,6 +37,8 @@ const SupplierList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Supplier | null>(null);
   const [form] = Form.useForm();
+  const { message } = useApp();
+  const [searchValue, setSearchValue] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -59,7 +62,7 @@ const SupplierList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal memuat data supplier');
+      message.error("Gagal memuat data supplier");
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ const SupplierList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal mencari supplier');
+      message.error("Gagal mencari supplier");
     } finally {
       setLoading(false);
     }
@@ -101,10 +104,10 @@ const SupplierList: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await supplierApi.delete(id);
-      message.success('Supplier berhasil dihapus');
+      message.success("Supplier berhasil dihapus");
       fetchData();
     } catch (error) {
-      message.error('Gagal menghapus supplier');
+      message.error("Gagal menghapus supplier");
     }
   };
 
@@ -113,24 +116,24 @@ const SupplierList: React.FC = () => {
       const values = await form.validateFields();
       if (editingItem) {
         await supplierApi.update(editingItem.id_supplier, values);
-        message.success('Supplier berhasil diupdate');
+        message.success("Supplier berhasil diupdate");
       } else {
         await supplierApi.create(values);
-        message.success('Supplier berhasil ditambahkan');
+        message.success("Supplier berhasil ditambahkan");
       }
       setModalVisible(false);
       form.resetFields();
       fetchData();
     } catch (error: any) {
-      message.error(error.response?.data?.message || 'Gagal menyimpan data');
+      message.error(error.response?.data?.message || "Gagal menyimpan data");
     }
   };
 
   const columns: ColumnsType<Supplier> = [
     {
-      title: 'Nama Supplier',
-      dataIndex: 'nama_supplier',
-      key: 'nama_supplier',
+      title: "Nama Supplier",
+      dataIndex: "nama_supplier",
+      key: "nama_supplier",
       render: (text) => (
         <Space>
           <ShopOutlined />
@@ -139,9 +142,9 @@ const SupplierList: React.FC = () => {
       ),
     },
     {
-      title: 'Alamat',
-      dataIndex: 'alamat',
-      key: 'alamat',
+      title: "Alamat",
+      dataIndex: "alamat",
+      key: "alamat",
       render: (alamat) =>
         alamat ? (
           <Space>
@@ -149,13 +152,13 @@ const SupplierList: React.FC = () => {
             {alamat}
           </Space>
         ) : (
-          '-'
+          "-"
         ),
     },
     {
-      title: 'Kontak',
-      dataIndex: 'kontak',
-      key: 'kontak',
+      title: "Kontak",
+      dataIndex: "kontak",
+      key: "kontak",
       render: (kontak) =>
         kontak ? (
           <Space>
@@ -163,12 +166,12 @@ const SupplierList: React.FC = () => {
             {kontak}
           </Space>
         ) : (
-          '-'
+          "-"
         ),
     },
     {
-      title: 'Aksi',
-      key: 'action',
+      title: "Aksi",
+      key: "action",
       render: (_: any, record: Supplier) => (
         <Space size="middle">
           <Button
@@ -185,11 +188,7 @@ const SupplierList: React.FC = () => {
             okText="Ya"
             cancelText="Tidak"
           >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            >
+            <Button danger size="small" icon={<DeleteOutlined />}>
               Hapus
             </Button>
           </Popconfirm>
@@ -206,23 +205,28 @@ const SupplierList: React.FC = () => {
         </Col>
         <Col>
           <Space>
-            <Search
-              placeholder="Cari supplier..."
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={fetchData}
-            >
+            <Space.Compact style={{ width: 250 }}>
+              <Input
+                placeholder="Cari supplier..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  if (!e.target.value) {
+                    fetchData();
+                  }
+                }}
+                onPressEnter={() => handleSearch(searchValue)}
+              />
+              <Button
+                icon={<SearchOutlined />}
+                onClick={() => handleSearch(searchValue)}
+              />
+            </Space.Compact>
+            <Button icon={<ReloadOutlined />} onClick={fetchData}>
               Refresh
             </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               Tambah Supplier
             </Button>
           </Space>
@@ -253,7 +257,7 @@ const SupplierList: React.FC = () => {
       </Card>
 
       <Modal
-        title={editingItem ? 'Edit Supplier' : 'Tambah Supplier'}
+        title={editingItem ? "Edit Supplier" : "Tambah Supplier"}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -266,7 +270,7 @@ const SupplierList: React.FC = () => {
           <Form.Item
             name="nama_supplier"
             label="Nama Supplier"
-            rules={[{ required: true, message: 'Nama supplier wajib diisi' }]}
+            rules={[{ required: true, message: "Nama supplier wajib diisi" }]}
           >
             <Input placeholder="Nama Supplier" />
           </Form.Item>
@@ -285,4 +289,3 @@ const SupplierList: React.FC = () => {
 };
 
 export default SupplierList;
-

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, message, Typography, Divider } from "antd";
+import { Form, Input, Button, Card, Typography, Divider, App } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import styled from "@emotion/styled";
 
 const { Title, Text } = Typography;
+const { useApp } = App;
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { message } = useApp();
 
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);

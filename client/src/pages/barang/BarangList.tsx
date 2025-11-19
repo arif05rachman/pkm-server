@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -7,27 +7,28 @@ import {
   Modal,
   Form,
   Select,
-  message,
+  App,
   Popconfirm,
   Typography,
   Tag,
   Row,
   Col,
   Card,
-} from 'antd';
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   ReloadOutlined,
-} from '@ant-design/icons';
-import { barangApi } from '../../api/barang';
-import type { Barang } from '../../types';
-import type { ColumnsType } from 'antd/es/table';
-import { getJenisColor } from '../../utils/formatters';
+  SearchOutlined,
+} from "@ant-design/icons";
+import { barangApi } from "../../api/barang";
+import type { Barang } from "../../types";
+import type { ColumnsType } from "antd/es/table";
+import { getJenisColor } from "../../utils/formatters";
 
 const { Title } = Typography;
-const { Search } = Input;
+const { useApp } = App;
 
 const BarangList: React.FC = () => {
   const [barang, setBarang] = useState<Barang[]>([]);
@@ -35,6 +36,8 @@ const BarangList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Barang | null>(null);
   const [form] = Form.useForm();
+  const { message } = useApp();
+  const [searchValue, setSearchValue] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -58,7 +61,7 @@ const BarangList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal memuat data barang');
+      message.error("Gagal memuat data barang");
     } finally {
       setLoading(false);
     }
@@ -75,7 +78,7 @@ const BarangList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal mencari barang');
+      message.error("Gagal mencari barang");
     } finally {
       setLoading(false);
     }
@@ -96,10 +99,10 @@ const BarangList: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await barangApi.delete(id);
-      message.success('Barang berhasil dihapus');
+      message.success("Barang berhasil dihapus");
       fetchData();
     } catch (error) {
-      message.error('Gagal menghapus barang');
+      message.error("Gagal menghapus barang");
     }
   };
 
@@ -108,52 +111,52 @@ const BarangList: React.FC = () => {
       const values = await form.validateFields();
       if (editingItem) {
         await barangApi.update(editingItem.id_barang, values);
-        message.success('Barang berhasil diupdate');
+        message.success("Barang berhasil diupdate");
       } else {
         await barangApi.create(values);
-        message.success('Barang berhasil ditambahkan');
+        message.success("Barang berhasil ditambahkan");
       }
       setModalVisible(false);
       form.resetFields();
       fetchData();
     } catch (error: any) {
-      message.error(error.response?.data?.message || 'Gagal menyimpan data');
+      message.error(error.response?.data?.message || "Gagal menyimpan data");
     }
   };
 
   const columns: ColumnsType<Barang> = [
     {
-      title: 'Nama Barang',
-      dataIndex: 'nama_barang',
-      key: 'nama_barang',
+      title: "Nama Barang",
+      dataIndex: "nama_barang",
+      key: "nama_barang",
     },
     {
-      title: 'Jenis',
-      dataIndex: 'jenis',
-      key: 'jenis',
+      title: "Jenis",
+      dataIndex: "jenis",
+      key: "jenis",
       render: (jenis: string) => (
         <Tag color={getJenisColor(jenis as any)}>{jenis}</Tag>
       ),
     },
     {
-      title: 'Satuan',
-      dataIndex: 'satuan',
-      key: 'satuan',
+      title: "Satuan",
+      dataIndex: "satuan",
+      key: "satuan",
     },
     {
-      title: 'Stok Minimal',
-      dataIndex: 'stok_minimal',
-      key: 'stok_minimal',
-      align: 'right',
+      title: "Stok Minimal",
+      dataIndex: "stok_minimal",
+      key: "stok_minimal",
+      align: "right",
     },
     {
-      title: 'Lokasi',
-      dataIndex: 'lokasi',
-      key: 'lokasi',
+      title: "Lokasi",
+      dataIndex: "lokasi",
+      key: "lokasi",
     },
     {
-      title: 'Aksi',
-      key: 'action',
+      title: "Aksi",
+      key: "action",
       render: (_: any, record: Barang) => (
         <Space size="middle">
           <Button
@@ -170,11 +173,7 @@ const BarangList: React.FC = () => {
             okText="Ya"
             cancelText="Tidak"
           >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            >
+            <Button danger size="small" icon={<DeleteOutlined />}>
               Hapus
             </Button>
           </Popconfirm>
@@ -191,23 +190,28 @@ const BarangList: React.FC = () => {
         </Col>
         <Col>
           <Space>
-            <Search
-              placeholder="Cari barang..."
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={fetchData}
-            >
+            <Space.Compact style={{ width: 250 }}>
+              <Input
+                placeholder="Cari barang..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  if (!e.target.value) {
+                    fetchData();
+                  }
+                }}
+                onPressEnter={() => handleSearch(searchValue)}
+              />
+              <Button
+                icon={<SearchOutlined />}
+                onClick={() => handleSearch(searchValue)}
+              />
+            </Space.Compact>
+            <Button icon={<ReloadOutlined />} onClick={fetchData}>
               Refresh
             </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               Tambah Barang
             </Button>
           </Space>
@@ -238,7 +242,7 @@ const BarangList: React.FC = () => {
       </Card>
 
       <Modal
-        title={editingItem ? 'Edit Barang' : 'Tambah Barang'}
+        title={editingItem ? "Edit Barang" : "Tambah Barang"}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -251,7 +255,7 @@ const BarangList: React.FC = () => {
           <Form.Item
             name="nama_barang"
             label="Nama Barang"
-            rules={[{ required: true, message: 'Nama barang wajib diisi' }]}
+            rules={[{ required: true, message: "Nama barang wajib diisi" }]}
           >
             <Input placeholder="Nama Barang" />
           </Form.Item>
@@ -261,7 +265,7 @@ const BarangList: React.FC = () => {
               <Form.Item
                 name="jenis"
                 label="Jenis"
-                rules={[{ required: true, message: 'Jenis wajib diisi' }]}
+                rules={[{ required: true, message: "Jenis wajib diisi" }]}
               >
                 <Select placeholder="Pilih Jenis">
                   <Select.Option value="Obat">Obat</Select.Option>
@@ -274,7 +278,7 @@ const BarangList: React.FC = () => {
               <Form.Item
                 name="satuan"
                 label="Satuan"
-                rules={[{ required: true, message: 'Satuan wajib diisi' }]}
+                rules={[{ required: true, message: "Satuan wajib diisi" }]}
               >
                 <Select placeholder="Pilih Satuan">
                   <Select.Option value="pcs">Pcs</Select.Option>
@@ -291,7 +295,11 @@ const BarangList: React.FC = () => {
                 name="stok_minimal"
                 label="Stok Minimal"
                 rules={[
-                  { type: 'number', min: 0, message: 'Stok minimal harus >= 0' },
+                  {
+                    type: "number",
+                    min: 0,
+                    message: "Stok minimal harus >= 0",
+                  },
                 ]}
               >
                 <Input type="number" placeholder="0" />
@@ -310,4 +318,3 @@ const BarangList: React.FC = () => {
 };
 
 export default BarangList;
-

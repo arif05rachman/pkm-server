@@ -17,17 +17,17 @@ app.use(helmet());
 app.use(corsMiddleware);
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: config.RATE_LIMIT.WINDOW_MS,
-  max: config.RATE_LIMIT.MAX_REQUESTS,
-  message: {
-    success: false,
-    message: "Too many requests from this IP, please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use(limiter);
+// const limiter = rateLimit({
+//   windowMs: config.RATE_LIMIT.WINDOW_MS,
+//   max: config.RATE_LIMIT.MAX_REQUESTS,
+//   message: {
+//     success: false,
+//     message: "Too many requests from this IP, please try again later.",
+//   },
+//   standardHeaders: true,
+//   legacyHeaders: false,
+// });
+// app.use(limiter);
 
 // Logging middleware
 if (config.NODE_ENV === "development") {

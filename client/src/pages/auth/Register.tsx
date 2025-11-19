@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, message, Typography } from 'antd';
+import { Form, Input, Button, Card, App, Typography } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../api/auth';
 import styled from '@emotion/styled';
 
 const { Title } = Typography;
+const { useApp } = App;
 
 const RegisterContainer = styled.div`
   min-height: 100vh;
@@ -26,6 +27,7 @@ const RegisterCard = styled(Card)`
 const Register: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { message } = useApp();
 
   const onFinish = async (values: any) => {
     setLoading(true);

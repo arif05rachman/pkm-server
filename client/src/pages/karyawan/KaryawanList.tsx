@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Table,
   Button,
@@ -6,7 +6,7 @@ import {
   Input,
   Modal,
   Form,
-  message,
+  App,
   Popconfirm,
   Typography,
   Tag,
@@ -14,21 +14,22 @@ import {
   Col,
   Card,
   Switch,
-} from 'antd';
+} from "antd";
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   ReloadOutlined,
   UserOutlined,
-} from '@ant-design/icons';
-import { karyawanApi } from '../../api/karyawan';
-import type { Karyawan } from '../../types';
-import type { ColumnsType } from 'antd/es/table';
+  SearchOutlined,
+} from "@ant-design/icons";
+import { karyawanApi } from "../../api/karyawan";
+import type { Karyawan } from "../../types";
+import type { ColumnsType } from "antd/es/table";
 
 const { Title } = Typography;
-const { Search } = Input;
 const { TextArea } = Input;
+const { useApp } = App;
 
 const KaryawanList: React.FC = () => {
   const [karyawan, setKaryawan] = useState<Karyawan[]>([]);
@@ -36,6 +37,8 @@ const KaryawanList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Karyawan | null>(null);
   const [form] = Form.useForm();
+  const { message } = useApp();
+  const [searchValue, setSearchValue] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -59,7 +62,7 @@ const KaryawanList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal memuat data karyawan');
+      message.error("Gagal memuat data karyawan");
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ const KaryawanList: React.FC = () => {
         total: data.pagination.total,
       }));
     } catch (error) {
-      message.error('Gagal mencari karyawan');
+      message.error("Gagal mencari karyawan");
     } finally {
       setLoading(false);
     }
@@ -101,10 +104,10 @@ const KaryawanList: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await karyawanApi.delete(id);
-      message.success('Karyawan berhasil dihapus');
+      message.success("Karyawan berhasil dihapus");
       fetchData();
     } catch (error) {
-      message.error('Gagal menghapus karyawan');
+      message.error("Gagal menghapus karyawan");
     }
   };
 
@@ -113,53 +116,53 @@ const KaryawanList: React.FC = () => {
       const values = await form.validateFields();
       if (editingItem) {
         await karyawanApi.update(editingItem.id_karyawan, values);
-        message.success('Karyawan berhasil diupdate');
+        message.success("Karyawan berhasil diupdate");
       } else {
         await karyawanApi.create(values);
-        message.success('Karyawan berhasil ditambahkan');
+        message.success("Karyawan berhasil ditambahkan");
       }
       setModalVisible(false);
       form.resetFields();
       fetchData();
     } catch (error: any) {
-      message.error(error.response?.data?.message || 'Gagal menyimpan data');
+      message.error(error.response?.data?.message || "Gagal menyimpan data");
     }
   };
 
   const columns: ColumnsType<Karyawan> = [
     {
-      title: 'Nama',
-      dataIndex: 'nama_karyawan',
-      key: 'nama_karyawan',
+      title: "Nama",
+      dataIndex: "nama_karyawan",
+      key: "nama_karyawan",
     },
     {
-      title: 'Jabatan',
-      dataIndex: 'jabatan',
-      key: 'jabatan',
+      title: "Jabatan",
+      dataIndex: "jabatan",
+      key: "jabatan",
     },
     {
-      title: 'NIP',
-      dataIndex: 'nip',
-      key: 'nip',
+      title: "NIP",
+      dataIndex: "nip",
+      key: "nip",
     },
     {
-      title: 'No. HP',
-      dataIndex: 'no_hp',
-      key: 'no_hp',
+      title: "No. HP",
+      dataIndex: "no_hp",
+      key: "no_hp",
     },
     {
-      title: 'Status',
-      dataIndex: 'status_aktif',
-      key: 'status_aktif',
+      title: "Status",
+      dataIndex: "status_aktif",
+      key: "status_aktif",
       render: (status: boolean) => (
-        <Tag color={status ? 'green' : 'red'}>
-          {status ? 'Aktif' : 'Tidak Aktif'}
+        <Tag color={status ? "green" : "red"}>
+          {status ? "Aktif" : "Tidak Aktif"}
         </Tag>
       ),
     },
     {
-      title: 'Aksi',
-      key: 'action',
+      title: "Aksi",
+      key: "action",
       render: (_: any, record: Karyawan) => (
         <Space size="middle">
           <Button
@@ -176,11 +179,7 @@ const KaryawanList: React.FC = () => {
             okText="Ya"
             cancelText="Tidak"
           >
-            <Button
-              danger
-              size="small"
-              icon={<DeleteOutlined />}
-            >
+            <Button danger size="small" icon={<DeleteOutlined />}>
               Hapus
             </Button>
           </Popconfirm>
@@ -197,23 +196,28 @@ const KaryawanList: React.FC = () => {
         </Col>
         <Col>
           <Space>
-            <Search
-              placeholder="Cari karyawan..."
-              allowClear
-              onSearch={handleSearch}
-              style={{ width: 250 }}
-            />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={fetchData}
-            >
+            <Space.Compact style={{ width: 250 }}>
+              <Input
+                placeholder="Cari karyawan..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  if (!e.target.value) {
+                    fetchData();
+                  }
+                }}
+                onPressEnter={() => handleSearch(searchValue)}
+              />
+              <Button
+                icon={<SearchOutlined />}
+                onClick={() => handleSearch(searchValue)}
+              />
+            </Space.Compact>
+            <Button icon={<ReloadOutlined />} onClick={fetchData}>
               Refresh
             </Button>
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleAdd}
-            >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
               Tambah Karyawan
             </Button>
           </Space>
@@ -244,7 +248,7 @@ const KaryawanList: React.FC = () => {
       </Card>
 
       <Modal
-        title={editingItem ? 'Edit Karyawan' : 'Tambah Karyawan'}
+        title={editingItem ? "Edit Karyawan" : "Tambah Karyawan"}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -260,7 +264,7 @@ const KaryawanList: React.FC = () => {
                 name="nama_karyawan"
                 label="Nama Karyawan"
                 rules={[
-                  { required: true, message: 'Nama karyawan wajib diisi' },
+                  { required: true, message: "Nama karyawan wajib diisi" },
                 ]}
               >
                 <Input prefix={<UserOutlined />} placeholder="Nama Karyawan" />
@@ -270,7 +274,7 @@ const KaryawanList: React.FC = () => {
               <Form.Item
                 name="jabatan"
                 label="Jabatan"
-                rules={[{ required: true, message: 'Jabatan wajib diisi' }]}
+                rules={[{ required: true, message: "Jabatan wajib diisi" }]}
               >
                 <Input placeholder="Jabatan" />
               </Form.Item>
@@ -294,11 +298,7 @@ const KaryawanList: React.FC = () => {
             <TextArea rows={3} placeholder="Alamat" />
           </Form.Item>
 
-          <Form.Item
-            name="status_aktif"
-            label="Status"
-            initialValue={true}
-          >
+          <Form.Item name="status_aktif" label="Status" initialValue={true}>
             <Switch checkedChildren="Aktif" unCheckedChildren="Tidak Aktif" />
           </Form.Item>
         </Form>
@@ -308,4 +308,3 @@ const KaryawanList: React.FC = () => {
 };
 
 export default KaryawanList;
-

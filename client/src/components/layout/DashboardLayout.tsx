@@ -8,6 +8,10 @@ import {
   LogoutOutlined,
   UserOutlined,
   ProfileOutlined,
+  UsergroupAddOutlined,
+  FileTextOutlined,
+  ImportOutlined,
+  ExportOutlined,
 } from '@ant-design/icons';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
@@ -81,6 +85,33 @@ const DashboardLayout: React.FC = () => {
       label: 'Supplier',
     },
     {
+      key: '/dashboard/users',
+      icon: <UsergroupAddOutlined />,
+      label: 'Users',
+    },
+    {
+      key: 'transaksi',
+      icon: <ImportOutlined />,
+      label: 'Transaksi',
+      children: [
+        {
+          key: '/dashboard/transaksi-masuk',
+          icon: <ImportOutlined />,
+          label: 'Transaksi Masuk',
+        },
+        {
+          key: '/dashboard/transaksi-keluar',
+          icon: <ExportOutlined />,
+          label: 'Transaksi Keluar',
+        },
+      ],
+    },
+    {
+      key: '/dashboard/log-activity',
+      icon: <FileTextOutlined />,
+      label: 'Log Activity',
+    },
+    {
       key: '/dashboard/profile',
       icon: <ProfileOutlined />,
       label: 'Profil',
@@ -115,7 +146,16 @@ const DashboardLayout: React.FC = () => {
     },
   ];
 
-  const selectedKey = location.pathname;
+  // Handle menu selection for nested routes
+  const getSelectedKeys = () => {
+    const path = location.pathname;
+    if (path.startsWith('/dashboard/transaksi-masuk') || path.startsWith('/dashboard/transaksi-keluar')) {
+      return ['transaksi', path];
+    }
+    return [path];
+  };
+
+  const selectedKeys = getSelectedKeys();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -143,7 +183,7 @@ const DashboardLayout: React.FC = () => {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[selectedKey]}
+          selectedKeys={selectedKeys}
           items={menuItems}
           onClick={handleMenuClick}
         />
