@@ -1,15 +1,12 @@
-import "tsconfig-paths/register";
-console.log("🚀 Initializing serverless function...");
-
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
-import { config } from "./config/env";
-import { corsMiddleware } from "./middleware/cors";
-import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
-import { testConnection } from "./config/database";
-import routes from "./routes";
+import { config } from "@/config/env";
+import { corsMiddleware } from "@/middleware/cors";
+import { errorHandler, notFoundHandler } from "@/middleware/errorHandler";
+import { testConnection } from "@/config/database";
+import routes from "@/routes";
 
 const app: express.Application = express();
 
@@ -87,7 +84,7 @@ const startServer = async (): Promise<void> => {
         console.log("✅ HTTP server closed");
 
         // Close database connections
-        const { closePool } = await import("./config/database");
+        const { closePool } = await import("@/config/database");
         await closePool();
 
         console.log("✅ Graceful shutdown completed");

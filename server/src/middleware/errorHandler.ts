@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { config } from "../config/env";
-import { ApiResponse } from "../types";
+import { config } from "@/config/env";
+import { ApiResponse } from "@/types";
 
 /**
  * Custom error class
