@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ConfigProvider, App as AntdApp } from "antd";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { defaultTheme } from "./utils/theme";
 import Login from "./pages/auth/Login";
 
 import DashboardLayout from "./components/layout/DashboardLayout";
@@ -19,6 +18,9 @@ import TransactionReport from "./pages/report/TransactionReport";
 import Profile from "./pages/profile/Profile";
 import NotFound from "./pages/NotFound";
 import "dayjs/locale/id";
+
+import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
+import { getThemeConfig } from "./utils/theme";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -42,9 +44,11 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return user ? <Navigate to="/dashboard" replace /> : <>{children}</>;
 };
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { mode } = useTheme();
+
   return (
-    <ConfigProvider theme={defaultTheme}>
+    <ConfigProvider theme={getThemeConfig(mode)}>
       <AntdApp>
         <AuthProvider>
           <BrowserRouter>
@@ -95,6 +99,14 @@ const App: React.FC = () => {
         </AuthProvider>
       </AntdApp>
     </ConfigProvider>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 

@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Layout, Menu, Avatar, Dropdown, Space, Typography } from "antd";
+import {
+  Layout,
+  Menu,
+  Avatar,
+  Dropdown,
+  Space,
+  Typography,
+  theme,
+  Button,
+} from "antd";
 import {
   DashboardOutlined,
   AppstoreOutlined,
@@ -11,16 +20,21 @@ import {
   ImportOutlined,
   ExportOutlined,
   FileTextOutlined,
+  MenuOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
 } from "@ant-design/icons";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import styled from "@emotion/styled";
+import ThemeToggle from "./ThemeToggle";
 
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
+const { useToken } = theme;
 
-const StyledHeader = styled(Header)`
-  background: rgba(255, 255, 255, 0.8) !important;
+const StyledHeader = styled(Header)<{ token: any }>`
+  background: ${(props) => props.token.colorBgContainer}CC !important;
   backdrop-filter: blur(6px);
   display: flex;
   justify-content: space-between;
@@ -29,16 +43,17 @@ const StyledHeader = styled(Header)`
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px dashed ${(props) => props.token.colorBorderSecondary};
 `;
 
-const StyledContent = styled(Content)`
+const StyledContent = styled(Content)<{ token: any }>`
   margin: 24px;
   padding: 24px;
-  background: #fff;
+  background: ${(props) => props.token.colorBgContainer};
   border-radius: 12px;
   min-height: calc(100vh - 112px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: ${(props) =>
+    props.token.mode === "dark" ? "none" : "0 4px 12px rgba(0, 0, 0, 0.03)"};
 `;
 
 const LogoContainer = styled.div`
@@ -64,6 +79,7 @@ const Logo = styled.div`
 `;
 
 const DashboardLayout: React.FC = () => {
+  const { token } = useToken();
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -181,12 +197,11 @@ const DashboardLayout: React.FC = () => {
       <Sider
         collapsible
         collapsed={collapsed}
-        onCollapse={setCollapsed}
         width={260}
-        theme="light"
+        trigger={null}
         style={{
-          borderRight: "1px dashed rgba(145, 158, 171, 0.24)",
-          background: "#fff",
+          borderRight: `1px dashed ${token.colorBorderSecondary}`,
+          background: token.colorBgContainer,
         }}
       >
         <LogoContainer>
@@ -194,47 +209,60 @@ const DashboardLayout: React.FC = () => {
           {!collapsed && (
             <div>
               <div
-                style={{ color: "#212B36", fontWeight: "bold", fontSize: 16 }}
+                style={{
+                  color: token.colorTextHeading,
+                  fontWeight: "bold",
+                  fontSize: 16,
+                }}
               >
                 Inventory
               </div>
-              <div style={{ color: "#637381", fontSize: 12 }}>Puskesmas</div>
+              <div style={{ color: token.colorTextDescription, fontSize: 12 }}>
+                Puskesmas
+              </div>
             </div>
           )}
         </LogoContainer>
 
         <Menu
-          theme="light"
           mode="inline"
           selectedKeys={selectedKeys}
           items={menuItems}
           onClick={handleMenuClick}
-          style={{ borderRight: 0 }}
+          style={{ borderRight: 0, background: "transparent" }}
         />
       </Sider>
 
-      <Layout style={{ background: "#F4F6F8" }}>
-        <StyledHeader>
-          <Text strong style={{ color: "#212B36", fontSize: 18 }}>
+      <Layout style={{ background: token.colorBgLayout }}>
+        <StyledHeader token={token}>
+          <Button
+            type="text"
+            icon={!collapsed ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+            onClick={() => setCollapsed(!collapsed)}
+          />
+          <Text strong style={{ color: token.colorTextHeading, fontSize: 18 }}>
             Sistem Inventory Management
           </Text>
 
-          <Space>
+          <Space size="middle">
+            <ThemeToggle />
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <Space style={{ cursor: "pointer" }}>
                 <Avatar
-                  style={{ backgroundColor: "#00A76F" }}
+                  style={{ backgroundColor: token.colorPrimary }}
                   icon={<UserOutlined />}
                 />
-                <Text style={{ color: "#212B36" }}>
-                  {user?.username || "User"}
-                </Text>
+                {!collapsed && (
+                  <Text style={{ color: token.colorText }}>
+                    {user?.username || "User"}
+                  </Text>
+                )}
               </Space>
             </Dropdown>
           </Space>
         </StyledHeader>
 
-        <StyledContent>
+        <StyledContent token={token}>
           <Outlet />
         </StyledContent>
       </Layout>
