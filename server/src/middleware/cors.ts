@@ -22,7 +22,10 @@ export const corsOptions = {
       "http://localhost:8080", // Vue CLI default port
     ];
 
-    if (allowedOrigins.includes(origin)) {
+    if (
+      allowedOrigins.includes(origin) ||
+      (origin && origin.endsWith(".vercel.app"))
+    ) {
       callback(null, true);
     } else {
       callback(new Error("Not allowed by CORS"));
