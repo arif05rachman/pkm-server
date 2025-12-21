@@ -5,21 +5,22 @@ import type { Karyawan } from "@/types";
 
 const { TextArea } = Input;
 
-interface KaryawanFormValues {
-  nama_karyawan: string;
-  jabatan: string;
-  nip?: string;
-  no_hp?: string;
-  alamat?: string;
-  status_aktif?: boolean;
-}
+// Form values type if needed, but we can rely on parent validation
+// interface KaryawanFormValues {
+//   nama_karyawan: string;
+//   jabatan: string;
+//   nip?: string;
+//   no_hp?: string;
+//   alamat?: string;
+//   status_aktif?: boolean;
+// }
 
 interface KaryawanModalProps {
   open: boolean;
   editingItem: Karyawan | null;
   onCancel: () => void;
-  onSubmit: (values: KaryawanFormValues) => Promise<boolean>;
-  form: FormInstance<KaryawanFormValues>;
+  onSubmit: () => Promise<void>;
+  form: FormInstance;
 }
 
 const KaryawanModal: React.FC<KaryawanModalProps> = ({
@@ -29,24 +30,11 @@ const KaryawanModal: React.FC<KaryawanModalProps> = ({
   onSubmit,
   form,
 }) => {
-  const handleOk = async () => {
-    try {
-      const values = await form.validateFields();
-      const success = await onSubmit(values);
-      if (success) {
-        form.resetFields();
-        onCancel();
-      }
-    } catch {
-      // Validation errors are handled by form
-    }
-  };
-
   return (
     <Modal
       title={editingItem ? "Edit Karyawan" : "Tambah Karyawan"}
       open={open}
-      onOk={handleOk}
+      onOk={onSubmit}
       onCancel={onCancel}
       width={700}
     >
@@ -89,7 +77,12 @@ const KaryawanModal: React.FC<KaryawanModalProps> = ({
           <TextArea rows={3} placeholder="Alamat" />
         </Form.Item>
 
-        <Form.Item name="status_aktif" label="Status" initialValue={true}>
+        <Form.Item
+          name="status_aktif"
+          label="Status"
+          valuePropName="checked"
+          initialValue={true}
+        >
           <Switch checkedChildren="Aktif" unCheckedChildren="Tidak Aktif" />
         </Form.Item>
       </Form>

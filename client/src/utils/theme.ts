@@ -29,9 +29,10 @@ export const defaultTheme = {
       groupTitleColor: "#919EAB",
     },
     Table: {
-      headerBg: "#F4F6F8",
-      headerColor: "#637381",
-      rowHoverBg: "#F4F6F8",
+      headerBg: "#00A76F",
+      headerColor: "#fff",
+      headerSplitColor: "transparent",
+      rowHoverBg: "rgba(0, 167, 111, 0.08)",
       headerBorderRadius: 8,
     },
     Button: {

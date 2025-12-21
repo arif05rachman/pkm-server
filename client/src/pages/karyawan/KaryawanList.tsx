@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   Button,
   Space,
   Input,
-  Form,
   Popconfirm,
   Typography,
   Tag,
   Row,
   Col,
-  Card,
 } from "antd";
 import {
   PlusOutlined,
@@ -27,10 +25,6 @@ import type { ColumnsType } from "antd/es/table";
 const { Title } = Typography;
 
 const KaryawanList: React.FC = () => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingItem, setEditingItem] = useState<Karyawan | null>(null);
-  const [form] = Form.useForm();
-
   const {
     karyawan,
     loading,
@@ -40,32 +34,16 @@ const KaryawanList: React.FC = () => {
     fetchData,
     handleSearch,
     handleDelete,
-    handleSubmit,
     setPagination,
+    // Modal & Form
+    modalVisible,
+    editingItem,
+    form,
+    handleAdd,
+    handleEdit,
+    handleModalCancel,
+    handleSubmit,
   } = useKaryawan();
-
-  const handleAdd = () => {
-    setEditingItem(null);
-    form.resetFields();
-    setModalVisible(true);
-  };
-
-  const handleEdit = (record: Karyawan) => {
-    setEditingItem(record);
-    form.setFieldsValue(record);
-    setModalVisible(true);
-  };
-
-  const handleModalSubmit = async (
-    values: Parameters<typeof handleSubmit>[0]
-  ) => {
-    return await handleSubmit(values, editingItem);
-  };
-
-  const handleModalCancel = () => {
-    setModalVisible(false);
-    form.resetFields();
-  };
 
   const columns: ColumnsType<Karyawan> = [
     {
@@ -138,12 +116,7 @@ const KaryawanList: React.FC = () => {
                 placeholder="Cari karyawan..."
                 allowClear
                 value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                  if (!e.target.value) {
-                    fetchData();
-                  }
-                }}
+                onChange={(e) => setSearchValue(e.target.value)}
                 onPressEnter={() => handleSearch(searchValue)}
               />
               <Button
@@ -187,7 +160,7 @@ const KaryawanList: React.FC = () => {
         open={modalVisible}
         editingItem={editingItem}
         onCancel={handleModalCancel}
-        onSubmit={handleModalSubmit}
+        onSubmit={handleSubmit}
         form={form}
       />
     </div>

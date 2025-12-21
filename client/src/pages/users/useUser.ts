@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { App } from "antd";
+import { App, Form } from "antd";
 import { usersApi } from "../../api/users";
 import { authApi } from "../../api/auth";
 import type { User } from "../../types";
@@ -14,6 +14,11 @@ export const useUser = () => {
     total: 0,
   });
   const [searchValue, setSearchValue] = useState("");
+
+  // Modal & Form State
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [form] = Form.useForm();
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -49,34 +54,8 @@ export const useUser = () => {
 
   const handleSearch = () => {
     setPagination((prev) => ({ ...prev, current: 1 }));
-    // fetchUsers will be triggered by useEffect when pagination changes
-    // But if pagination doesn't change (still 1), we might need to trigger it.
-    // However, in the original code, handleSearch called fetchData directly.
-    // Since fetchUsers depends on searchValue, and searchValue is state,
-    // simply changing searchValue might not trigger useEffect if we don't include it in deps
-    // OR we can just rely on the button click to call handleSearch which triggers fetchUsers?
-    // Actually, looking at original code:
-    // useEffect depends on [pagination.current, pagination.pageSize].
-    // handleSearch sets pagination current to 1 AND calls fetchData().
-
-    // In this hook:
-    // If I add searchValue to dependency array of fetchUsers, then changing searchValue will trigger fetchUsers?
-    // The original code `fetchData` uses `searchValue` state.
-    // But `useEffect` ONLY watched pagination.
-
-    // Let's mimic original behavior:
-    // useEffect(() => { fetchData() }, [pagination.current, pagination.pageSize]);
-    // handleSearch -> setPagination -> fetchData
-
-    // If I call fetchUsers() here, it uses the closure's state? No, it uses the state from the render.
-    // It should be fine as long as we assume React batches or we await.
     fetchUsers();
   };
-
-  // NOTE: The original code's useEffect ONLY watched pagination.
-  // If I add searchValue to useCallback deps, and then to useEffect deps, it will auto-search on type.
-  // The original code had an onChange that called fetchData if value is empty.
-  // And a explicit handleSearch button.
 
   const deleteUser = async (id: number) => {
     try {
@@ -116,6 +95,52 @@ export const useUser = () => {
     }
   };
 
+  // Modal Handlers
+  const handleAdd = () => {
+    setEditingUser(null);
+    form.resetFields();
+    form.setFieldsValue({
+      role: "user",
+      is_active: true,
+    });
+    setModalVisible(true);
+  };
+
+  const handleEdit = (record: User) => {
+    setEditingUser(record);
+    form.setFieldsValue({
+      username: record.username,
+      email: record.email,
+      role: record.role,
+      is_active: record.is_active,
+    });
+    setModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      let success = false;
+      if (editingUser) {
+        success = await updateUser(editingUser.id, values);
+      } else {
+        success = await addUser(values);
+      }
+
+      if (success) {
+        setModalVisible(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      console.error("Validate Failed:", error);
+    }
+  };
+
   const changePage = (page: number, pageSize: number) => {
     setPagination((prev) => ({
       ...prev,
@@ -133,8 +158,14 @@ export const useUser = () => {
     fetchUsers,
     handleSearch,
     deleteUser,
-    updateUser,
-    addUser,
-    changePage, // helper for Table onChange
+    changePage,
+    // Modal & Form exports
+    modalVisible,
+    editingUser,
+    form,
+    handleAdd,
+    handleEdit,
+    handleModalCancel,
+    handleSubmit,
   };
 };

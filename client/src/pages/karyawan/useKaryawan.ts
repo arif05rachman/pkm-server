@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { App } from "antd";
+import { App, Form } from "antd";
 import { karyawanApi } from "@/api/karyawan";
 import type { Karyawan } from "@/types";
 
@@ -12,33 +12,7 @@ interface KaryawanFormValues {
   status_aktif?: boolean;
 }
 
-interface UseKaryawanReturn {
-  karyawan: Karyawan[];
-  loading: boolean;
-  pagination: {
-    current: number;
-    pageSize: number;
-    total: number;
-  };
-  searchValue: string;
-  setSearchValue: (value: string) => void;
-  fetchData: () => Promise<void>;
-  handleSearch: (value: string) => Promise<void>;
-  handleDelete: (id: number) => Promise<void>;
-  handleSubmit: (
-    values: KaryawanFormValues,
-    editingItem: Karyawan | null
-  ) => Promise<boolean>;
-  setPagination: React.Dispatch<
-    React.SetStateAction<{
-      current: number;
-      pageSize: number;
-      total: number;
-    }>
-  >;
-}
-
-export const useKaryawan = (): UseKaryawanReturn => {
+export const useKaryawan = () => {
   const [karyawan, setKaryawan] = useState<Karyawan[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -49,6 +23,11 @@ export const useKaryawan = (): UseKaryawanReturn => {
   });
   const { message } = App.useApp();
   const paginationRef = useRef(pagination);
+
+  // Modal & Form State
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingItem, setEditingItem] = useState<Karyawan | null>(null);
+  const [form] = Form.useForm();
 
   // Keep ref in sync with state
   useEffect(() => {
@@ -81,14 +60,21 @@ export const useKaryawan = (): UseKaryawanReturn => {
   }, [pagination.current, pagination.pageSize]);
 
   const handleSearch = useCallback(
-    async (value: string) => {
-      if (!value) {
+    async (value?: string) => {
+      // If value is provided use it, otherwise use state
+      const searchVal = value !== undefined ? value : searchValue;
+
+      if (!searchVal) {
         fetchData();
         return;
       }
       setLoading(true);
       try {
-        const data = await karyawanApi.search(value, 1, pagination.pageSize);
+        const data = await karyawanApi.search(
+          searchVal,
+          1,
+          pagination.pageSize
+        );
         setKaryawan(data.data);
         setPagination((prev) => ({
           ...prev,
@@ -101,7 +87,7 @@ export const useKaryawan = (): UseKaryawanReturn => {
         setLoading(false);
       }
     },
-    [pagination.pageSize, fetchData, message]
+    [pagination.pageSize, fetchData, message, searchValue]
   );
 
   const handleDelete = useCallback(
@@ -117,33 +103,76 @@ export const useKaryawan = (): UseKaryawanReturn => {
     [fetchData, message]
   );
 
-  const handleSubmit = useCallback(
-    async (
-      values: KaryawanFormValues,
-      editingItem: Karyawan | null
-    ): Promise<boolean> => {
-      try {
-        if (editingItem) {
-          await karyawanApi.update(editingItem.id_karyawan, values);
-          message.success("Karyawan berhasil diupdate");
-        } else {
-          await karyawanApi.create(values);
-          message.success("Karyawan berhasil ditambahkan");
-        }
-        fetchData();
-        return true;
-      } catch (error: unknown) {
-        const errorMessage =
-          error && typeof error === "object" && "response" in error
-            ? (error as { response?: { data?: { message?: string } } }).response
-                ?.data?.message
-            : undefined;
-        message.error(errorMessage || "Gagal menyimpan data");
-        return false;
+  const createKaryawan = async (values: KaryawanFormValues) => {
+    try {
+      await karyawanApi.create(values);
+      message.success("Karyawan berhasil ditambahkan");
+      fetchData();
+      return true;
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      message.error(errorMessage || "Gagal menambahkan karyawan");
+      return false;
+    }
+  };
+
+  const updateKaryawan = async (id: number, values: KaryawanFormValues) => {
+    try {
+      await karyawanApi.update(id, values);
+      message.success("Karyawan berhasil diupdate");
+      fetchData();
+      return true;
+    } catch (error: unknown) {
+      const errorMessage =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response
+              ?.data?.message
+          : undefined;
+      message.error(errorMessage || "Gagal mengupdate karyawan");
+      return false;
+    }
+  };
+
+  // Modal Handlers
+  const handleAdd = () => {
+    setEditingItem(null);
+    form.resetFields();
+    setModalVisible(true);
+  };
+
+  const handleEdit = (record: Karyawan) => {
+    setEditingItem(record);
+    form.setFieldsValue(record);
+    setModalVisible(true);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    form.resetFields();
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+      let success = false;
+      if (editingItem) {
+        success = await updateKaryawan(editingItem.id_karyawan, values);
+      } else {
+        success = await createKaryawan(values);
       }
-    },
-    [fetchData, message]
-  );
+
+      if (success) {
+        setModalVisible(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      console.error("Validate Failed:", error);
+    }
+  };
 
   return {
     karyawan,
@@ -154,7 +183,14 @@ export const useKaryawan = (): UseKaryawanReturn => {
     fetchData,
     handleSearch,
     handleDelete,
-    handleSubmit,
     setPagination,
+    // Modal & Form
+    modalVisible,
+    editingItem,
+    form,
+    handleAdd,
+    handleEdit,
+    handleModalCancel,
+    handleSubmit,
   };
 };

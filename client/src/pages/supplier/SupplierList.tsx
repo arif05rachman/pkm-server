@@ -199,10 +199,8 @@ const SupplierList: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Col>
-          <Title level={2}>Manajemen Supplier</Title>
-        </Col>
+      <Title level={2}>Manajemen Supplier</Title>
+      <Row justify="end" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Space>
             <Space.Compact style={{ width: 250 }}>

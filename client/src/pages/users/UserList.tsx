@@ -1,19 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Table,
   Button,
   Space,
   Input,
-  Modal,
-  Form,
   Popconfirm,
   Typography,
   Tag,
   Row,
   Col,
-  Card,
-  Select,
-  Switch,
 } from "antd";
 import {
   ReloadOutlined,
@@ -26,6 +21,7 @@ import {
 import type { User } from "../../types";
 import type { ColumnsType } from "antd/es/table";
 import { useUser } from "./useUser";
+import UserModal from "./UserModal";
 
 const { Title } = Typography;
 
@@ -39,55 +35,16 @@ const UserList: React.FC = () => {
     fetchUsers,
     handleSearch,
     deleteUser,
-    updateUser,
-    addUser,
     changePage,
+    // Modal & Form
+    modalVisible,
+    editingUser,
+    form,
+    handleAdd,
+    handleEdit,
+    handleModalCancel,
+    handleSubmit,
   } = useUser();
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [form] = Form.useForm();
-
-  const handleAdd = () => {
-    setEditingUser(null);
-    form.resetFields();
-    // Default values for new user
-    form.setFieldsValue({
-      role: "user",
-      is_active: true,
-    });
-    setModalVisible(true);
-  };
-
-  const handleEdit = (record: User) => {
-    setEditingUser(record);
-    form.setFieldsValue({
-      username: record.username,
-      email: record.email,
-      role: record.role,
-      is_active: record.is_active,
-    });
-    setModalVisible(true);
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      let success = false;
-      if (editingUser) {
-        success = await updateUser(editingUser.id, values);
-      } else {
-        success = await addUser(values);
-      }
-
-      if (success) {
-        setModalVisible(false);
-        form.resetFields();
-      }
-    } catch (error) {
-      console.error("Validate Failed:", error);
-    }
-  };
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -177,13 +134,7 @@ const UserList: React.FC = () => {
                 placeholder="Cari user..."
                 allowClear
                 value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                  // Optional: trigger fetch if cleared, though hook might auto-trigger
-                  if (!e.target.value) {
-                    // With the current hook implementation, clearing triggers update via effect
-                  }
-                }}
+                onChange={(e) => setSearchValue(e.target.value)}
                 onPressEnter={handleSearch}
               />
               <Button icon={<SearchOutlined />} onClick={handleSearch} />
@@ -198,86 +149,29 @@ const UserList: React.FC = () => {
         </Col>
       </Row>
 
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={users}
-          rowKey="id"
-          loading={loading}
-          scroll={{ x: "max-content" }}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} user`,
-            onChange: (page, pageSize) => {
-              changePage(page, pageSize);
-            },
-          }}
-        />
-      </Card>
-
-      <Modal
-        title={editingUser ? "Edit User" : "Tambah User"}
-        open={modalVisible}
-        onOk={handleSubmit}
-        onCancel={() => {
-          setModalVisible(false);
-          form.resetFields();
+      <Table
+        columns={columns}
+        dataSource={users}
+        rowKey="id"
+        loading={loading}
+        scroll={{ x: "max-content" }}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} user`,
+          onChange: changePage,
         }}
-        width={600}
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="username"
-            label="Username"
-            rules={[{ required: true, message: "Username wajib diisi" }]}
-          >
-            <Input placeholder="Username" />
-          </Form.Item>
+      />
 
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Email wajib diisi" },
-              { type: "email", message: "Format email tidak valid" },
-            ]}
-          >
-            <Input placeholder="Email" />
-          </Form.Item>
-
-          {!editingUser && (
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                { required: true, message: "Password wajib diisi" },
-                { min: 6, message: "Password minimal 6 karakter" },
-              ]}
-            >
-              <Input.Password placeholder="Password" />
-            </Form.Item>
-          )}
-
-          <Form.Item
-            name="role"
-            label="Role"
-            rules={[{ required: true, message: "Role wajib diisi" }]}
-          >
-            <Select placeholder="Pilih Role">
-              <Select.Option value="admin">Admin</Select.Option>
-              <Select.Option value="manager">Manager</Select.Option>
-              <Select.Option value="user">User</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="is_active" label="Status" valuePropName="checked">
-            <Switch checkedChildren="Aktif" unCheckedChildren="Tidak Aktif" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      <UserModal
+        open={modalVisible}
+        editingUser={editingUser}
+        onCancel={handleModalCancel}
+        onSubmit={handleSubmit}
+        form={form}
+      />
     </div>
   );
 };
