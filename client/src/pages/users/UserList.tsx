@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Table,
   Button,
@@ -6,7 +6,6 @@ import {
   Input,
   Modal,
   Form,
-  App,
   Popconfirm,
   Typography,
   Tag,
@@ -22,63 +21,42 @@ import {
   DeleteOutlined,
   UserOutlined,
   SearchOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
-import { usersApi } from "../../api/users";
 import type { User } from "../../types";
 import type { ColumnsType } from "antd/es/table";
+import { useUser } from "./useUser";
 
 const { Title } = Typography;
-const { useApp } = App;
 
 const UserList: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    users,
+    loading,
+    pagination,
+    searchValue,
+    setSearchValue,
+    fetchUsers,
+    handleSearch,
+    deleteUser,
+    updateUser,
+    addUser,
+    changePage,
+  } = useUser();
+
   const [modalVisible, setModalVisible] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
-  const { message } = useApp();
-  const [pagination, setPagination] = useState({
-    current: 1,
-    pageSize: 10,
-    total: 0,
-  });
-  const [searchValue, setSearchValue] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, [pagination.current, pagination.pageSize]);
-
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const data = await usersApi.getAll(
-        pagination.current,
-        pagination.pageSize
-      );
-      // Filter by search if needed
-      let filteredData = data.data;
-      if (searchValue) {
-        filteredData = data.data.filter(
-          (user) =>
-            user.username.toLowerCase().includes(searchValue.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchValue.toLowerCase())
-        );
-      }
-      setUsers(filteredData);
-      setPagination((prev) => ({
-        ...prev,
-        total: data.pagination.total,
-      }));
-    } catch {
-      message.error("Gagal memuat data user");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSearch = () => {
-    setPagination((prev) => ({ ...prev, current: 1 }));
-    fetchData();
+  const handleAdd = () => {
+    setEditingUser(null);
+    form.resetFields();
+    // Default values for new user
+    form.setFieldsValue({
+      role: "user",
+      is_active: true,
+    });
+    setModalVisible(true);
   };
 
   const handleEdit = (record: User) => {
@@ -92,29 +70,22 @@ const UserList: React.FC = () => {
     setModalVisible(true);
   };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await usersApi.delete(id);
-      message.success("User berhasil dihapus");
-      fetchData();
-    } catch {
-      message.error("Gagal menghapus user");
-    }
-  };
-
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
+      let success = false;
       if (editingUser) {
-        await usersApi.update(editingUser.id, values);
-        message.success("User berhasil diupdate");
+        success = await updateUser(editingUser.id, values);
+      } else {
+        success = await addUser(values);
       }
-      setModalVisible(false);
-      form.resetFields();
-      fetchData();
-    } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
-      message.error(error.response?.data?.message || "Gagal menyimpan data");
+
+      if (success) {
+        setModalVisible(false);
+        form.resetFields();
+      }
+    } catch (error) {
+      console.error("Validate Failed:", error);
     }
   };
 
@@ -169,6 +140,7 @@ const UserList: React.FC = () => {
     {
       title: "Aksi",
       key: "action",
+      fixed: "right",
       render: (_: unknown, record: User) => (
         <Space size="middle">
           <Button
@@ -181,7 +153,7 @@ const UserList: React.FC = () => {
           </Button>
           <Popconfirm
             title="Hapus user ini?"
-            onConfirm={() => handleDelete(record.id)}
+            onConfirm={() => deleteUser(record.id)}
             okText="Ya"
             cancelText="Tidak"
           >
@@ -196,10 +168,8 @@ const UserList: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-        <Col>
-          <Title level={2}>Manajemen User</Title>
-        </Col>
+      <Title level={2}>Manajemen User</Title>
+      <Row justify="end" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Space>
             <Space.Compact style={{ width: 250 }}>
@@ -209,16 +179,20 @@ const UserList: React.FC = () => {
                 value={searchValue}
                 onChange={(e) => {
                   setSearchValue(e.target.value);
+                  // Optional: trigger fetch if cleared, though hook might auto-trigger
                   if (!e.target.value) {
-                    fetchData();
+                    // With the current hook implementation, clearing triggers update via effect
                   }
                 }}
                 onPressEnter={handleSearch}
               />
               <Button icon={<SearchOutlined />} onClick={handleSearch} />
             </Space.Compact>
-            <Button icon={<ReloadOutlined />} onClick={fetchData}>
+            <Button icon={<ReloadOutlined />} onClick={fetchUsers}>
               Refresh
+            </Button>
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+              Tambah User
             </Button>
           </Space>
         </Col>
@@ -230,6 +204,7 @@ const UserList: React.FC = () => {
           dataSource={users}
           rowKey="id"
           loading={loading}
+          scroll={{ x: "max-content" }}
           pagination={{
             current: pagination.current,
             pageSize: pagination.pageSize,
@@ -237,18 +212,14 @@ const UserList: React.FC = () => {
             showSizeChanger: true,
             showTotal: (total) => `Total ${total} user`,
             onChange: (page, pageSize) => {
-              setPagination((prev) => ({
-                ...prev,
-                current: page,
-                pageSize,
-              }));
+              changePage(page, pageSize);
             },
           }}
         />
       </Card>
 
       <Modal
-        title="Edit User"
+        title={editingUser ? "Edit User" : "Tambah User"}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -276,6 +247,19 @@ const UserList: React.FC = () => {
           >
             <Input placeholder="Email" />
           </Form.Item>
+
+          {!editingUser && (
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[
+                { required: true, message: "Password wajib diisi" },
+                { min: 6, message: "Password minimal 6 karakter" },
+              ]}
+            >
+              <Input.Password placeholder="Password" />
+            </Form.Item>
+          )}
 
           <Form.Item
             name="role"

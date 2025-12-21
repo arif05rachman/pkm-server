@@ -101,6 +101,7 @@ const KaryawanList: React.FC = () => {
     {
       title: "Aksi",
       key: "action",
+      fixed: "right",
       render: (_: unknown, record: Karyawan) => (
         <Space size="middle">
           <Button
@@ -128,12 +129,10 @@ const KaryawanList: React.FC = () => {
 
   return (
     <div>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+      <Title level={2}>Manajemen Karyawan</Title>
+      <Row justify="end" align="middle" style={{ marginBottom: 24 }}>
         <Col>
-          <Title level={2}>Manajemen Karyawan</Title>
-        </Col>
-        <Col>
-          <Space>
+          <Space align="end">
             <Space.Compact style={{ width: 250 }}>
               <Input
                 placeholder="Cari karyawan..."
@@ -162,29 +161,27 @@ const KaryawanList: React.FC = () => {
         </Col>
       </Row>
 
-      <Card>
-        <Table
-          columns={columns}
-          dataSource={karyawan}
-          rowKey="id_karyawan"
-          loading={loading}
-          pagination={{
-            current: pagination.current,
-            pageSize: pagination.pageSize,
-            total: pagination.total,
-            showSizeChanger: true,
-            showTotal: (total) => `Total ${total} karyawan`,
-            onChange: (page, pageSize) => {
-              setPagination((prev) => ({
-                ...prev,
-                current: page,
-                pageSize,
-              }));
-            },
-          }}
-          scroll={{ x: "max-content" }}
-        />
-      </Card>
+      <Table
+        columns={columns}
+        dataSource={karyawan}
+        rowKey="id_karyawan"
+        loading={loading}
+        pagination={{
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} karyawan`,
+          onChange: (page, pageSize) => {
+            setPagination((prev) => ({
+              ...prev,
+              current: page,
+              pageSize,
+            }));
+          },
+        }}
+        scroll={{ x: "max-content" }}
+      />
 
       <KaryawanModal
         open={modalVisible}

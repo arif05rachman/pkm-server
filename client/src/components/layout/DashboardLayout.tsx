@@ -20,40 +20,47 @@ const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 
 const StyledHeader = styled(Header)`
-  background: #001529 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 `;
 
 const StyledContent = styled(Content)`
   margin: 24px;
   padding: 24px;
   background: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   min-height: calc(100vh - 112px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 `;
 
 const LogoContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  margin: 16px 0;
+  margin: 20px 0 20px 0;
   padding: 0 24px;
 `;
 
 const Logo = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
+  background: linear-gradient(135deg, #00a76f 0%, #007867 100%);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-weight: bold;
-  font-size: 18px;
+  font-size: 20px;
+  box-shadow: 0 4px 8px rgba(0, 167, 111, 0.24);
 `;
 
 const DashboardLayout: React.FC = () => {
@@ -160,35 +167,40 @@ const DashboardLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        width={250}
-        theme="dark"
+        width={260}
+        theme="light"
+        style={{
+          borderRight: "1px dashed rgba(145, 158, 171, 0.24)",
+          background: "#fff",
+        }}
       >
         <LogoContainer>
           <Logo>SI</Logo>
           {!collapsed && (
             <div>
-              <div style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>
+              <div
+                style={{ color: "#212B36", fontWeight: "bold", fontSize: 16 }}
+              >
                 Inventory
               </div>
-              <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 12 }}>
-                Puskesmas
-              </div>
+              <div style={{ color: "#637381", fontSize: 12 }}>Puskesmas</div>
             </div>
           )}
         </LogoContainer>
 
         <Menu
-          theme="dark"
+          theme="light"
           mode="inline"
           selectedKeys={selectedKeys}
           items={menuItems}
           onClick={handleMenuClick}
+          style={{ borderRight: 0 }}
         />
       </Sider>
 
-      <Layout>
+      <Layout style={{ background: "#F4F6F8" }}>
         <StyledHeader>
-          <Text strong style={{ color: "white", fontSize: 18 }}>
+          <Text strong style={{ color: "#212B36", fontSize: 18 }}>
             Sistem Inventory Management
           </Text>
 
@@ -196,10 +208,10 @@ const DashboardLayout: React.FC = () => {
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <Space style={{ cursor: "pointer" }}>
                 <Avatar
-                  style={{ backgroundColor: "#1890ff" }}
+                  style={{ backgroundColor: "#00A76F" }}
                   icon={<UserOutlined />}
                 />
-                <Text style={{ color: "white" }}>
+                <Text style={{ color: "#212B36" }}>
                   {user?.username || "User"}
                 </Text>
               </Space>

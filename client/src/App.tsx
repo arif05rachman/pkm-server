@@ -4,7 +4,7 @@ import { ConfigProvider, App as AntdApp } from "antd";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { defaultTheme } from "./utils/theme";
 import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
+
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import BarangList from "./pages/barang/BarangList";
@@ -17,7 +17,6 @@ import TransaksiKeluarList from "./pages/transaksi/TransaksiKeluarList";
 import Profile from "./pages/profile/Profile";
 import NotFound from "./pages/NotFound";
 import "dayjs/locale/id";
-import "@ant-design/v5-patch-for-react-19";
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -56,14 +55,7 @@ const App: React.FC = () => {
                   </PublicRoute>
                 }
               />
-              <Route
-                path="/register"
-                element={
-                  <PublicRoute>
-                    <Register />
-                  </PublicRoute>
-                }
-              />
+
               <Route path="/404" element={<NotFound />} />
               <Route
                 path="/dashboard"
