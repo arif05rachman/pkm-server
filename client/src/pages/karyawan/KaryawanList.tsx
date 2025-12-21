@@ -139,6 +139,7 @@ const KaryawanList: React.FC = () => {
         dataSource={karyawan}
         rowKey="id_karyawan"
         loading={loading}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
@@ -153,7 +154,6 @@ const KaryawanList: React.FC = () => {
             }));
           },
         }}
-        scroll={{ x: "max-content" }}
       />
 
       <KaryawanModal

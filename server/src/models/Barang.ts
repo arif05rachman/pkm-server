@@ -9,8 +9,8 @@ export class BarangModel {
     const { nama_barang, satuan, jenis, stok_minimal = 0, lokasi } = barangData;
 
     const query = `
-      INSERT INTO barang (nama_barang, satuan, jenis, stok_minimal, lokasi, created_at, updated_at)
-      VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+      INSERT INTO barang (nama_barang, satuan, jenis, stok_minimal, stok, lokasi, created_at, updated_at)
+      VALUES ($1, $2, $3, $4, 0, $5, NOW(), NOW())
       RETURNING *
     `;
 
@@ -82,7 +82,9 @@ export class BarangModel {
       paramCount++;
     }
 
-    query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${
+      paramCount + 1
+    }`;
     queryParams.push(limit, offset);
 
     const result = await pool.query(query, queryParams);
@@ -199,5 +201,20 @@ export class BarangModel {
     const result = await pool.query(query, params);
     return result.rows.length > 0;
   }
+  /**
+   * Update stock quantity
+   */
+  static async updateStock(
+    id_barang: number,
+    change: number
+  ): Promise<Barang | null> {
+    const query = `
+      UPDATE barang 
+      SET stok = stok + $1, updated_at = NOW()
+      WHERE id_barang = $2
+      RETURNING *
+    `;
+    const result = await pool.query(query, [change, id_barang]);
+    return result.rows[0] || null;
+  }
 }
-

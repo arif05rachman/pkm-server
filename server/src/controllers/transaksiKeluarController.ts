@@ -3,6 +3,7 @@ import {
   TransaksiKeluarModel,
   DetailTransaksiKeluarModel,
 } from "@/models/TransaksiKeluar";
+import { BarangModel } from "@/models/Barang";
 import { asyncHandler, AppError } from "@/middleware/errorHandler";
 import {
   ApiResponse,
@@ -45,6 +46,22 @@ export const createTransaksiKeluar = asyncHandler(
       if (detail.jumlah <= 0) {
         throw new AppError("Jumlah harus lebih besar dari 0", 400);
       }
+
+      // Check sufficient stock
+      const barang = await BarangModel.findById(detail.id_barang);
+      if (!barang) {
+        throw new AppError(
+          `Barang dengan ID ${detail.id_barang} tidak ditemukan`,
+          404
+        );
+      }
+
+      if (barang.stok < detail.jumlah) {
+        throw new AppError(
+          `Stok tidak mencukupi untuk barang ${barang.nama_barang}. Stok saat ini: ${barang.stok}`,
+          400
+        );
+      }
     }
 
     // Use authenticated user's ID
@@ -63,6 +80,11 @@ export const createTransaksiKeluar = asyncHandler(
       },
       userId
     );
+
+    // Update stock for each item
+    for (const detail of details) {
+      await BarangModel.updateStock(detail.id_barang, -detail.jumlah);
+    }
 
     const response: ApiResponse<TransaksiKeluarWithDetails> = {
       success: true,
@@ -122,9 +144,7 @@ export const getTransaksiKeluarById = asyncHandler(
       throw new AppError("ID transaksi keluar tidak valid", 400);
     }
 
-    const transaksi = await TransaksiKeluarModel.findById(
-      id_transaksi_keluar
-    );
+    const transaksi = await TransaksiKeluarModel.findById(id_transaksi_keluar);
     if (!transaksi) {
       throw new AppError("Transaksi keluar tidak ditemukan", 404);
     }
@@ -160,7 +180,8 @@ export const updateTransaksiKeluarById = asyncHandler(
     }
 
     const updateData: UpdateTransaksiKeluarRequest = {};
-    if (tanggal_keluar !== undefined) updateData.tanggal_keluar = tanggal_keluar;
+    if (tanggal_keluar !== undefined)
+      updateData.tanggal_keluar = tanggal_keluar;
     if (tujuan !== undefined) updateData.tujuan = tujuan;
     if (keterangan !== undefined) updateData.keterangan = keterangan;
 
@@ -330,4 +351,3 @@ export const deleteDetailTransaksiKeluarById = asyncHandler(
     });
   }
 );
-

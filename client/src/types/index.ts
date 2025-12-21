@@ -22,6 +22,7 @@ export interface Barang {
   satuan: "pcs" | "botol" | "tablet";
   jenis: "Obat" | "Alkes" | "BMHP";
   stok_minimal: number;
+  stok: number;
   lokasi?: string;
   created_at: string;
   updated_at: string;
@@ -73,17 +74,6 @@ export interface ApiResponse<T> {
 export interface ApiError {
   success: false;
   message: string;
-}
-
-// Log Activity types
-export interface LogActivity {
-  id_log: number;
-  id_user: number | null;
-  waktu: string;
-  aksi: string;
-  deskripsi: string | null;
-  ip_address: string | null;
-  created_at: string;
 }
 
 // Transaksi Masuk types

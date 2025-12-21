@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Card, Statistic, Table, Tag, Typography } from 'antd';
-import { TeamOutlined, AppstoreOutlined } from '@ant-design/icons';
-import { barangApi } from '../../api/barang';
-import { karyawanApi } from '../../api/karyawan';
-import type { ColumnsType } from 'antd/es/table';
-import type { Barang } from '../../types';
-import styled from '@emotion/styled';
+import React, { useEffect, useState } from "react";
+import { Row, Col, Card, Statistic, Table, Tag, Typography } from "antd";
+import { TeamOutlined, AppstoreOutlined } from "@ant-design/icons";
+import { barangApi } from "../../api/barang";
+import { karyawanApi } from "../../api/karyawan";
+import type { ColumnsType } from "antd/es/table";
+import type { Barang } from "../../types";
+import styled from "@emotion/styled";
 
 const { Title } = Typography;
 
@@ -42,7 +42,7 @@ const Dashboard: React.FC = () => {
 
       setRecentBarang(barangData.data);
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
+      console.error("Failed to fetch dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -50,32 +50,32 @@ const Dashboard: React.FC = () => {
 
   const columns: ColumnsType<Barang> = [
     {
-      title: 'Nama Barang',
-      dataIndex: 'nama_barang',
-      key: 'nama_barang',
+      title: "Nama Barang",
+      dataIndex: "nama_barang",
+      key: "nama_barang",
     },
     {
-      title: 'Jenis',
-      dataIndex: 'jenis',
-      key: 'jenis',
+      title: "Jenis",
+      dataIndex: "jenis",
+      key: "jenis",
       render: (jenis) => <Tag color="blue">{jenis}</Tag>,
     },
     {
-      title: 'Satuan',
-      dataIndex: 'satuan',
-      key: 'satuan',
+      title: "Satuan",
+      dataIndex: "satuan",
+      key: "satuan",
     },
     {
-      title: 'Stok Minimal',
-      dataIndex: 'stok_minimal',
-      key: 'stok_minimal',
+      title: "Stok Minimal",
+      dataIndex: "stok_minimal",
+      key: "stok_minimal",
     },
   ];
 
   return (
     <DashboardContainer>
       <Title level={2}>Dashboard</Title>
-      
+
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} md={12}>
           <Card>
@@ -108,6 +108,7 @@ const Dashboard: React.FC = () => {
           loading={loading}
           pagination={false}
           size="small"
+          scroll={{ x: "max-content" }}
         />
       </Card>
     </DashboardContainer>
@@ -115,4 +116,3 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
-

@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS barang (
     satuan VARCHAR(20) NOT NULL CHECK (satuan IN ('pcs', 'botol', 'tablet')),
     jenis VARCHAR(20) NOT NULL CHECK (jenis IN ('Obat', 'Alkes', 'BMHP')),
     stok_minimal INTEGER NOT NULL DEFAULT 0,
+    stok INTEGER NOT NULL DEFAULT 0,
     lokasi VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -306,22 +307,7 @@ CREATE TRIGGER update_detail_transaksi_keluar_updated_at
 CREATE INDEX IF NOT EXISTS idx_detail_transaksi_keluar_transaksi ON detail_transaksi_keluar(id_transaksi_keluar);
 CREATE INDEX IF NOT EXISTS idx_detail_transaksi_keluar_barang ON detail_transaksi_keluar(id_barang);
 
--- Create log_activity table
-CREATE TABLE IF NOT EXISTS log_activity (
-    id_log SERIAL PRIMARY KEY,
-    id_user INTEGER REFERENCES users(id) ON DELETE SET NULL,
-    waktu TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    aksi VARCHAR(50) NOT NULL,
-    deskripsi TEXT,
-    ip_address VARCHAR(45),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
--- Create indexes for log_activity
-CREATE INDEX IF NOT EXISTS idx_log_activity_user ON log_activity(id_user);
-CREATE INDEX IF NOT EXISTS idx_log_activity_waktu ON log_activity(waktu);
-CREATE INDEX IF NOT EXISTS idx_log_activity_aksi ON log_activity(aksi);
-CREATE INDEX IF NOT EXISTS idx_log_activity_ip ON log_activity(ip_address);
 
 -- ============================================
 -- INITIAL DATA

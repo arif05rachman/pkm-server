@@ -82,8 +82,12 @@ export class TransaksiKeluarModel {
     id_transaksi_keluar: number
   ): Promise<TransaksiKeluarWithDetails | null> {
     // Get transaksi
-    const transaksiQuery =
-      "SELECT * FROM transaksi_keluar WHERE id_transaksi_keluar = $1";
+    const transaksiQuery = `
+      SELECT tk.*, u.username
+      FROM transaksi_keluar tk
+      LEFT JOIN users u ON tk.id_user = u.id
+      WHERE tk.id_transaksi_keluar = $1
+    `;
     const transaksiResult = await pool.query(transaksiQuery, [
       id_transaksi_keluar,
     ]);
@@ -151,29 +155,36 @@ export class TransaksiKeluarModel {
     const total = parseInt(countResult.rows[0].count);
 
     // Build select query with filters
-    let query = "SELECT * FROM transaksi_keluar WHERE 1=1";
+    let query = `
+      SELECT tk.*, u.username
+      FROM transaksi_keluar tk
+      LEFT JOIN users u ON tk.id_user = u.id
+      WHERE 1=1
+    `;
     const queryParams: any[] = [];
     paramCount = 1;
 
     if (startDate) {
-      query += ` AND tanggal_keluar >= $${paramCount}`;
+      query += ` AND tk.tanggal_keluar >= $${paramCount}`;
       queryParams.push(startDate);
       paramCount++;
     }
 
     if (endDate) {
-      query += ` AND tanggal_keluar <= $${paramCount}`;
+      query += ` AND tk.tanggal_keluar <= $${paramCount}`;
       queryParams.push(endDate);
       paramCount++;
     }
 
     if (tujuan) {
-      query += ` AND tujuan ILIKE $${paramCount}`;
+      query += ` AND tk.tujuan ILIKE $${paramCount}`;
       queryParams.push(`%${tujuan}%`);
       paramCount++;
     }
 
-    query += ` ORDER BY tanggal_keluar DESC, created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    query += ` ORDER BY tk.tanggal_keluar DESC, tk.created_at DESC LIMIT $${paramCount} OFFSET $${
+      paramCount + 1
+    }`;
     queryParams.push(limit, offset);
 
     const result = await pool.query(query, queryParams);
@@ -268,7 +279,8 @@ export class DetailTransaksiKeluarModel {
   static async findById(
     id_detail_keluar: number
   ): Promise<DetailTransaksiKeluar | null> {
-    const query = "SELECT * FROM detail_transaksi_keluar WHERE id_detail_keluar = $1";
+    const query =
+      "SELECT * FROM detail_transaksi_keluar WHERE id_detail_keluar = $1";
     const result = await pool.query(query, [id_detail_keluar]);
 
     return result.rows[0] || null;
@@ -342,4 +354,3 @@ export class DetailTransaksiKeluarModel {
     return (result.rowCount ?? 0) > 0;
   }
 }
-

@@ -3,6 +3,7 @@ import {
   TransaksiMasukModel,
   DetailTransaksiMasukModel,
 } from "@/models/TransaksiMasuk";
+import { BarangModel } from "@/models/Barang";
 import { asyncHandler, AppError } from "@/middleware/errorHandler";
 import {
   ApiResponse,
@@ -22,24 +23,21 @@ import {
  */
 export const createTransaksiMasuk = asyncHandler(
   async (req: AuthenticatedRequest, res: Response): Promise<void> => {
-    const {
-      tanggal_masuk,
-      id_supplier,
-      keterangan,
-      details,
-    } = req.body as CreateTransaksiMasukRequest;
+    const { tanggal_masuk, id_supplier, keterangan, details } =
+      req.body as CreateTransaksiMasukRequest;
 
     // Validate required fields
     if (!tanggal_masuk || !details || details.length === 0) {
-      throw new AppError(
-        "Tanggal masuk dan detail transaksi wajib diisi",
-        400
-      );
+      throw new AppError("Tanggal masuk dan detail transaksi wajib diisi", 400);
     }
 
     // Validate details
     for (const detail of details) {
-      if (!detail.id_barang || !detail.jumlah || detail.harga_satuan === undefined) {
+      if (
+        !detail.id_barang ||
+        !detail.jumlah ||
+        detail.harga_satuan === undefined
+      ) {
         throw new AppError(
           "Setiap detail harus memiliki id_barang, jumlah, dan harga_satuan",
           400
@@ -71,6 +69,11 @@ export const createTransaksiMasuk = asyncHandler(
       },
       userId
     );
+
+    // Update stock for each item
+    for (const detail of details) {
+      await BarangModel.updateStock(detail.id_barang, detail.jumlah);
+    }
 
     const response: ApiResponse<TransaksiMasukWithDetails> = {
       success: true,
@@ -245,7 +248,11 @@ export const addDetailTransaksiMasuk = asyncHandler(
     }
 
     // Validate
-    if (!detailData.id_barang || !detailData.jumlah || detailData.harga_satuan === undefined) {
+    if (
+      !detailData.id_barang ||
+      !detailData.jumlah ||
+      detailData.harga_satuan === undefined
+    ) {
       throw new AppError(
         "id_barang, jumlah, dan harga_satuan wajib diisi",
         400
@@ -354,4 +361,3 @@ export const deleteDetailTransaksiMasukById = asyncHandler(
     });
   }
 );
-

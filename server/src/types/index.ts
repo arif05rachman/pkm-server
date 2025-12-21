@@ -124,6 +124,7 @@ export interface Barang {
   satuan: "pcs" | "botol" | "tablet";
   jenis: "Obat" | "Alkes" | "BMHP";
   stok_minimal: number;
+  stok: number;
   lokasi: string | null;
   created_at: Date;
   updated_at: Date;
@@ -269,23 +270,4 @@ export interface UpdateTransaksiKeluarRequest {
 export interface UpdateDetailTransaksiKeluarRequest {
   id_barang?: number;
   jumlah?: number;
-}
-
-// Log Activity types
-export interface LogActivity {
-  id_log: number;
-  id_user: number | null;
-  waktu: Date;
-  aksi: string;
-  deskripsi: string | null;
-  ip_address: string | null;
-  created_at: Date;
-}
-
-export interface CreateLogActivityRequest {
-  id_user?: number;
-  aksi: string;
-  deskripsi?: string;
-  ip_address?: string;
-  waktu?: string; // Optional, defaults to current timestamp
 }

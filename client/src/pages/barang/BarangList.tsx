@@ -73,6 +73,20 @@ const BarangList: React.FC = () => {
       align: "right",
     },
     {
+      title: "Stok",
+      dataIndex: "stok",
+      key: "stok",
+      align: "right",
+      render: (stok: number, record: Barang) => (
+        <Typography.Text
+          type={stok <= record.stok_minimal ? "danger" : undefined}
+          strong
+        >
+          {stok}
+        </Typography.Text>
+      ),
+    },
+    {
       title: "Lokasi",
       dataIndex: "lokasi",
       key: "lokasi",
@@ -137,6 +151,7 @@ const BarangList: React.FC = () => {
         dataSource={barang}
         rowKey="id_barang"
         loading={loading}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,
@@ -145,7 +160,6 @@ const BarangList: React.FC = () => {
           showTotal: (total) => `Total ${total} barang`,
           onChange: changePage,
         }}
-        scroll={{ x: "max-content" }}
       />
 
       <BarangModal

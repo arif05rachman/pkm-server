@@ -8,9 +8,9 @@ import {
   LogoutOutlined,
   UserOutlined,
   UsergroupAddOutlined,
-  FileTextOutlined,
   ImportOutlined,
   ExportOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -113,9 +113,21 @@ const DashboardLayout: React.FC = () => {
       ],
     },
     {
-      key: "/dashboard/log-activity",
+      key: "laporan",
       icon: <FileTextOutlined />,
-      label: "Log Activity",
+      label: "Laporan",
+      children: [
+        {
+          key: "/dashboard/laporan/kartu-stok",
+          icon: <FileTextOutlined />,
+          label: "Kartu Stok",
+        },
+        {
+          key: "/dashboard/laporan/transaksi",
+          icon: <FileTextOutlined />,
+          label: "Laporan Transaksi",
+        },
+      ],
     },
   ];
 
@@ -155,6 +167,9 @@ const DashboardLayout: React.FC = () => {
       path.startsWith("/dashboard/transaksi-keluar")
     ) {
       return ["transaksi", path];
+    }
+    if (path.startsWith("/dashboard/laporan")) {
+      return ["laporan", path];
     }
     return [path];
   };

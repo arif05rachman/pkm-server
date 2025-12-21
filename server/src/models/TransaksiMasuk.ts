@@ -84,8 +84,13 @@ export class TransaksiMasukModel {
     id_transaksi_masuk: number
   ): Promise<TransaksiMasukWithDetails | null> {
     // Get transaksi
-    const transaksiQuery =
-      "SELECT * FROM transaksi_masuk WHERE id_transaksi_masuk = $1";
+    const transaksiQuery = `
+      SELECT tm.*, s.nama_supplier, u.username
+      FROM transaksi_masuk tm
+      LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
+      LEFT JOIN users u ON tm.id_user = u.id
+      WHERE tm.id_transaksi_masuk = $1
+    `;
     const transaksiResult = await pool.query(transaksiQuery, [
       id_transaksi_masuk,
     ]);
@@ -98,9 +103,11 @@ export class TransaksiMasukModel {
 
     // Get details
     const detailsQuery = `
-      SELECT * FROM detail_transaksi_masuk 
-      WHERE id_transaksi_masuk = $1
-      ORDER BY id_detail_masuk
+      SELECT dtm.*, b.nama_barang
+      FROM detail_transaksi_masuk dtm
+      JOIN barang b ON dtm.id_barang = b.id_barang
+      WHERE dtm.id_transaksi_masuk = $1
+      ORDER BY dtm.id_detail_masuk
     `;
     const detailsResult = await pool.query(detailsQuery, [id_transaksi_masuk]);
 
@@ -153,29 +160,37 @@ export class TransaksiMasukModel {
     const total = parseInt(countResult.rows[0].count);
 
     // Build select query with filters
-    let query = "SELECT * FROM transaksi_masuk WHERE 1=1";
+    let query = `
+      SELECT tm.*, s.nama_supplier, u.username
+      FROM transaksi_masuk tm
+      LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
+      LEFT JOIN users u ON tm.id_user = u.id
+      WHERE 1=1
+    `;
     const queryParams: any[] = [];
     paramCount = 1;
 
     if (startDate) {
-      query += ` AND tanggal_masuk >= $${paramCount}`;
+      query += ` AND tm.tanggal_masuk >= $${paramCount}`;
       queryParams.push(startDate);
       paramCount++;
     }
 
     if (endDate) {
-      query += ` AND tanggal_masuk <= $${paramCount}`;
+      query += ` AND tm.tanggal_masuk <= $${paramCount}`;
       queryParams.push(endDate);
       paramCount++;
     }
 
     if (id_supplier) {
-      query += ` AND id_supplier = $${paramCount}`;
+      query += ` AND tm.id_supplier = $${paramCount}`;
       queryParams.push(id_supplier);
       paramCount++;
     }
 
-    query += ` ORDER BY tanggal_masuk DESC, created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    query += ` ORDER BY tm.tanggal_masuk DESC, tm.created_at DESC LIMIT $${paramCount} OFFSET $${
+      paramCount + 1
+    }`;
     queryParams.push(limit, offset);
 
     const result = await pool.query(query, queryParams);
@@ -272,7 +287,8 @@ export class DetailTransaksiMasukModel {
   static async findById(
     id_detail_masuk: number
   ): Promise<DetailTransaksiMasuk | null> {
-    const query = "SELECT * FROM detail_transaksi_masuk WHERE id_detail_masuk = $1";
+    const query =
+      "SELECT * FROM detail_transaksi_masuk WHERE id_detail_masuk = $1";
     const result = await pool.query(query, [id_detail_masuk]);
 
     return result.rows[0] || null;
@@ -346,4 +362,3 @@ export class DetailTransaksiMasukModel {
     return (result.rowCount ?? 0) > 0;
   }
 }
-

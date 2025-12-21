@@ -6,7 +6,7 @@ import barangRoutes from "./barang";
 import supplierRoutes from "./supplier";
 import transaksiMasukRoutes from "./transaksiMasuk";
 import transaksiKeluarRoutes from "./transaksiKeluar";
-import logActivityRoutes from "./logActivity";
+import reportRoutes from "./report";
 
 const router: Router = Router();
 
@@ -28,7 +28,7 @@ router.use("/barang", barangRoutes);
 router.use("/supplier", supplierRoutes);
 router.use("/transaksi-masuk", transaksiMasukRoutes);
 router.use("/transaksi-keluar", transaksiKeluarRoutes);
-router.use("/logs", logActivityRoutes);
+router.use("/reports", reportRoutes);
 
 // API documentation endpoint
 router.get("/", (req, res) => {

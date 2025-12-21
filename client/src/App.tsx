@@ -11,9 +11,11 @@ import BarangList from "./pages/barang/BarangList";
 import KaryawanList from "./pages/karyawan/KaryawanList";
 import SupplierList from "./pages/supplier/SupplierList";
 import UserList from "./pages/users/UserList";
-import LogActivityList from "./pages/logActivity/LogActivityList";
+
 import TransaksiMasukList from "./pages/transaksi/TransaksiMasukList";
 import TransaksiKeluarList from "./pages/transaksi/TransaksiKeluarList";
+import StockCard from "./pages/report/StockCard";
+import TransactionReport from "./pages/report/TransactionReport";
 import Profile from "./pages/profile/Profile";
 import NotFound from "./pages/NotFound";
 import "dayjs/locale/id";
@@ -70,7 +72,7 @@ const App: React.FC = () => {
                 <Route path="karyawan" element={<KaryawanList />} />
                 <Route path="supplier" element={<SupplierList />} />
                 <Route path="users" element={<UserList />} />
-                <Route path="log-activity" element={<LogActivityList />} />
+
                 <Route
                   path="transaksi-masuk"
                   element={<TransaksiMasukList />}
@@ -78,6 +80,11 @@ const App: React.FC = () => {
                 <Route
                   path="transaksi-keluar"
                   element={<TransaksiKeluarList />}
+                />
+                <Route path="laporan/kartu-stok" element={<StockCard />} />
+                <Route
+                  path="laporan/transaksi"
+                  element={<TransactionReport />}
                 />
                 <Route path="profile" element={<Profile />} />
               </Route>
