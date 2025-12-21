@@ -10,31 +10,59 @@ const isServerless = !!(
   process.env.SERVERLESS
 );
 
-// Use connection string if available (common in serverless environments)
-// Otherwise, use individual connection parameters
-const getDbConfig = (): PoolConfig => {
-  const baseConfig: PoolConfig = {
-    max: isServerless ? 1 : 20, // Single connection per serverless instance
-    idleTimeoutMillis: isServerless ? 10000 : 30000,
-    connectionTimeoutMillis: isServerless ? 90000 : 30000, // 90s for serverless to handle cold starts
-    statement_timeout: 30000, // 30 seconds max query time
-    allowExitOnIdle: isServerless, // Allow pool to exit when idle in serverless
-  };
+// Global pool cache untuk serverless (WAJIB untuk Vercel)
+// Mencegah multiple pool instances yang menyebabkan timeout
+declare global {
+  var _pgPool: Pool | undefined;
+}
 
-  // If DATABASE_URL is provided, use it (common in serverless platforms)
+// Check if using Supabase Transaction Pooler
+const isSupabasePooler = (connectionString?: string): boolean => {
+  if (!connectionString) return false;
+  return (
+    connectionString.includes("pooler.supabase.com") &&
+    connectionString.includes(":6543")
+  );
+};
+
+// Get database configuration
+const getDbConfig = (): PoolConfig => {
+  // Priority: DATABASE_URL (recommended for Supabase + Vercel)
   if (process.env.DATABASE_URL) {
+    const isPooler = isSupabasePooler(process.env.DATABASE_URL);
+
+    // Log connection info untuk debugging
+    if (isServerless) {
+      try {
+        const dbHost = process.env.DATABASE_URL.split("@")[1]?.split("/")[0];
+        console.log(`🔍 DB Connection: ${dbHost || "DATABASE_URL"}`);
+        if (isPooler) {
+          console.log("✅ Using Supabase Transaction Pooler (recommended)");
+        } else if (process.env.DATABASE_URL.includes("supabase.co")) {
+          console.warn(
+            "⚠️ WARNING: Using direct Supabase connection. Switch to Transaction Pooler!"
+          );
+        }
+      } catch (e) {
+        // Ignore parsing errors
+      }
+    }
+
     return {
-      ...baseConfig,
       connectionString: process.env.DATABASE_URL,
       ssl: process.env.DATABASE_URL.includes("localhost")
         ? false
         : { rejectUnauthorized: false },
+      max: 1, // WAJIB untuk Supabase free tier & serverless
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 15000, // 15s untuk Supabase pooler
+      statement_timeout: 30000, // 30 seconds max query time
+      allowExitOnIdle: isServerless,
     };
   }
 
-  // Fallback to individual connection parameters
+  // Fallback: individual connection parameters (untuk development)
   return {
-    ...baseConfig,
     host: process.env.DB_HOST || "localhost",
     port: parseInt(process.env.DB_PORT || "5432"),
     database: process.env.DB_NAME || "inventory_db",
@@ -44,25 +72,34 @@ const getDbConfig = (): PoolConfig => {
       process.env.DB_HOST && !process.env.DB_HOST.includes("localhost")
         ? { rejectUnauthorized: false }
         : false,
+    max: isServerless ? 1 : 20,
+    idleTimeoutMillis: isServerless ? 10000 : 30000,
+    connectionTimeoutMillis: isServerless ? 15000 : 30000,
+    statement_timeout: 30000,
+    allowExitOnIdle: isServerless,
   };
 };
 
-const dbConfig = getDbConfig();
+// Create or reuse global pool (WAJIB untuk serverless)
+// Mencegah "new Pool()" dibuat berulang kali yang menyebabkan timeout
+if (!global._pgPool) {
+  const dbConfig = getDbConfig();
+  global._pgPool = new Pool(dbConfig);
 
-export const pool = new Pool(dbConfig);
+  // Handle pool errors
+  global._pgPool.on("error", (err) => {
+    console.error("❌ Unexpected error on idle client", err);
+  });
 
-// Handle pool errors with better logging
-pool.on("error", (err) => {
-  console.error("❌ Unexpected error on idle client", err);
-  // Don't crash the app, just log the error
-});
-
-// Handle connection errors
-pool.on("connect", (client) => {
+  // Log successful connection
   if (isServerless) {
-    console.log("✅ New database connection established (serverless)");
+    global._pgPool.on("connect", () => {
+      console.log("✅ Database connection established (serverless)");
+    });
   }
-});
+}
+
+export const pool = global._pgPool;
 
 // Wrap pool.query to handle AggregateError and retry for serverless
 // This intercepts all queries and adds retry logic for timeout errors
@@ -134,20 +171,41 @@ export const testConnection = async (): Promise<boolean> => {
       client.release();
     }
 
-    const dbInfo = process.env.DATABASE_URL
-      ? "DATABASE_URL"
-      : `${process.env.DB_HOST || "localhost"}:${
-          process.env.DB_PORT || "5432"
-        }`;
+    // Log connection details
+    let dbInfo: string;
+    if (process.env.DATABASE_URL) {
+      try {
+        const dbHost =
+          process.env.DATABASE_URL.split("@")[1]?.split("/")[0] ||
+          "DATABASE_URL";
+        dbInfo = dbHost;
+      } catch {
+        dbInfo = "DATABASE_URL";
+      }
+    } else {
+      dbInfo = `${process.env.DB_HOST || "localhost"}:${
+        process.env.DB_PORT || "5432"
+      }`;
+    }
 
-    console.log(
-      `✅ Database connected successfully to ${dbInfo} (${
-        isServerless ? "serverless" : "standard"
-      } mode)`
-    );
+    const mode = isServerless ? "serverless" : "standard";
+    const poolerStatus =
+      process.env.DATABASE_URL && isSupabasePooler(process.env.DATABASE_URL)
+        ? " (Transaction Pooler ✅)"
+        : "";
+
+    console.log(`✅ Database connected: ${dbInfo} (${mode}${poolerStatus})`);
     return true;
   } catch (error) {
     console.error("❌ Database connection failed:", error);
+    if (
+      process.env.DATABASE_URL &&
+      !isSupabasePooler(process.env.DATABASE_URL)
+    ) {
+      console.error(
+        "💡 TIP: Pastikan menggunakan Supabase Transaction Pooler (port 6543)"
+      );
+    }
     return false;
   }
 };
