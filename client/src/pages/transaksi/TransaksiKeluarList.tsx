@@ -181,6 +181,8 @@ const TransaksiKeluarList: React.FC = () => {
     {
       title: "Aksi",
       key: "action",
+      fixed: "right",
+      width: 220,
       render: (_: any, record: TransaksiKeluar) => (
         <Space size="middle">
           <Button

@@ -80,6 +80,7 @@ const KaryawanList: React.FC = () => {
       title: "Aksi",
       key: "action",
       fixed: "right",
+      width: 150,
       render: (_: unknown, record: Karyawan) => (
         <Space size="middle">
           <Button

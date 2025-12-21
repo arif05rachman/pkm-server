@@ -23,18 +23,18 @@ export const getThemeConfig = (mode: "light" | "dark"): ThemeConfig => ({
     Menu: {
       itemBg: "transparent",
       itemColor: mode === "dark" ? "#919EAB" : "#637381",
-      itemHoverBg: "rgba(0, 167, 111, 0.08)",
-      itemSelectedBg: "rgba(0, 167, 111, 0.16)",
+      itemHoverBg: mode === "dark" ? "#1E353B" : "#F2FBF8",
+      itemSelectedBg: mode === "dark" ? "#1C3F3F" : "#E6F6F1",
       itemSelectedColor: "#00A76F",
       itemHoverColor: "#00A76F",
-      itemActiveBg: "rgba(0, 167, 111, 0.16)",
+      itemActiveBg: mode === "dark" ? "#1C3F3F" : "#E6F6F1",
       groupTitleColor: "#919EAB",
     },
     Table: {
       headerBg: "#00A76F",
       headerColor: "#fff",
       headerSplitColor: "transparent",
-      rowHoverBg: "rgba(0, 167, 111, 0.08)",
+      rowHoverBg: mode === "dark" ? "#1E353B" : "#F2FBF8",
       headerBorderRadius: 8,
     },
     Button: {

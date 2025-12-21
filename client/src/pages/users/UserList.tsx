@@ -98,6 +98,7 @@ const UserList: React.FC = () => {
       title: "Aksi",
       key: "action",
       fixed: "right",
+      width: 150,
       render: (_: unknown, record: User) => (
         <Space size="middle">
           <Button

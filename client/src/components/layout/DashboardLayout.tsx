@@ -20,7 +20,6 @@ import {
   ImportOutlined,
   ExportOutlined,
   FileTextOutlined,
-  MenuOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
 } from "@ant-design/icons";

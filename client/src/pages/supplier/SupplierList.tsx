@@ -172,6 +172,8 @@ const SupplierList: React.FC = () => {
     {
       title: "Aksi",
       key: "action",
+      fixed: "right",
+      width: 170,
       render: (_: any, record: Supplier) => (
         <Space size="middle">
           <Button

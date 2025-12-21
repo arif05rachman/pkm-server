@@ -95,6 +95,7 @@ const BarangList: React.FC = () => {
       title: "Aksi",
       key: "action",
       fixed: "right",
+      width: 150,
       render: (_: any, record: Barang) => (
         <Space size="middle">
           <Button
