@@ -1,5 +1,5 @@
 import cors from "cors";
-import { config } from "@/config/env";
+import { config } from "../config/env";
 
 /**
  * CORS configuration

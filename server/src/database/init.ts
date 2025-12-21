@@ -1,4 +1,4 @@
-import { pool } from "@/config/database";
+import { pool } from "../config/database";
 import fs from "fs";
 import path from "path";
 
