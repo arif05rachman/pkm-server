@@ -21,4 +21,21 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "./src/assets"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          // Ant Design UI library
+          "antd-vendor": ["antd", "@ant-design/icons"],
+          // Utilities
+          "utils-vendor": ["axios", "dayjs"],
+          // Emotion styling
+          "emotion-vendor": ["@emotion/react", "@emotion/styled"],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
 });
