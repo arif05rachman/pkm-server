@@ -6,7 +6,7 @@ interface UpdateUserRequest {
   email?: string;
   role?: "admin" | "manager" | "user";
   is_active?: boolean;
-  employee_id?: number;
+  employee_id?: number | null;
 }
 
 export const userService = {

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { App, Form } from "antd";
-import { usersApi } from "../../api/users";
-import { authApi } from "../../api/auth";
+import usersApi from "../../api/users";
+import authService from "../../api/auth";
 import type { User } from "../../types";
 
 export const useUser = () => {
@@ -31,7 +31,7 @@ export const useUser = () => {
       let filteredData = data.data;
       if (searchValue) {
         filteredData = data.data.filter(
-          (user) =>
+          (user: User) =>
             user.username.toLowerCase().includes(searchValue.toLowerCase()) ||
             user.email.toLowerCase().includes(searchValue.toLowerCase())
         );
@@ -84,7 +84,7 @@ export const useUser = () => {
 
   const addUser = async (values: any) => {
     try {
-      await authApi.register(values);
+      await authService.register(values);
       message.success("User berhasil ditambahkan");
       fetchUsers();
       return true;
