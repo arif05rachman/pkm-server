@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Row, Col, Card, Statistic, Table, Tag, Typography } from "antd";
 import { TeamOutlined, AppstoreOutlined } from "@ant-design/icons";
-import { barangApi } from "../../api/barang";
-import { karyawanApi } from "../../api/karyawan";
+import productService from "../../api/product";
+import employeeService from "../../api/employee";
 import type { ColumnsType } from "antd/es/table";
-import type { Barang } from "../../types";
+import type { Product } from "../../types";
 import styled from "@emotion/styled";
 
 const { Title } = Typography;
@@ -17,10 +17,10 @@ const DashboardContainer = styled.div`
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
-    barang: 0,
-    karyawan: 0,
+    products: 0,
+    employees: 0,
   });
-  const [recentBarang, setRecentBarang] = useState<Barang[]>([]);
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,17 +30,17 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [barangData, karyawanData] = await Promise.all([
-        barangApi.getAll(1, 5),
-        karyawanApi.getAll(1, 5),
+      const [productData, employeeData] = await Promise.all([
+        productService.getAll(1, 5),
+        employeeService.getAll(1, 5),
       ]);
 
       setStats({
-        barang: barangData.pagination.total,
-        karyawan: karyawanData.pagination.total,
+        products: productData.pagination.total,
+        employees: employeeData.pagination.total,
       });
 
-      setRecentBarang(barangData.data);
+      setRecentProducts(productData.data);
     } catch (error) {
       console.error("Failed to fetch dashboard data:", error);
     } finally {
@@ -48,40 +48,40 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const columns: ColumnsType<Barang> = [
+  const columns: ColumnsType<Product> = [
     {
-      title: "Nama Barang",
-      dataIndex: "nama_barang",
-      key: "nama_barang",
+      title: "Product Name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: "Jenis",
-      dataIndex: "jenis",
-      key: "jenis",
-      render: (jenis) => <Tag color="blue">{jenis}</Tag>,
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (type) => <Tag color="blue">{type}</Tag>,
     },
     {
-      title: "Satuan",
-      dataIndex: "satuan",
-      key: "satuan",
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
     },
     {
-      title: "Stok Minimal",
-      dataIndex: "stok_minimal",
-      key: "stok_minimal",
+      title: "Min Stock",
+      dataIndex: "min_stock",
+      key: "min_stock",
     },
   ];
 
   return (
     <DashboardContainer>
-      <Title level={2}>Dashboard</Title>
+      <Title level={2}>Dashboard Overview</Title>
 
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col xs={24} sm={12} md={12}>
           <Card>
             <Statistic
-              title="Total Barang"
-              value={stats.barang}
+              title="Total Products"
+              value={stats.products}
               prefix={<AppstoreOutlined />}
               loading={loading}
             />
@@ -90,8 +90,8 @@ const Dashboard: React.FC = () => {
         <Col xs={24} sm={12} md={12}>
           <Card>
             <Statistic
-              title="Total Karyawan"
-              value={stats.karyawan}
+              title="Total Employees"
+              value={stats.employees}
               prefix={<TeamOutlined />}
               loading={loading}
             />
@@ -100,11 +100,11 @@ const Dashboard: React.FC = () => {
       </Row>
 
       <Card>
-        <Title level={4}>Barang Terbaru</Title>
+        <Title level={4}>Recently Added Products</Title>
         <Table
           columns={columns}
-          dataSource={recentBarang}
-          rowKey="id_barang"
+          dataSource={recentProducts}
+          rowKey="id"
           loading={loading}
           pagination={false}
           size="small"

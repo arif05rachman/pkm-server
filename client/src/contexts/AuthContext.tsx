@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { User } from "../types";
-import { authApi } from "../api/auth";
+import authService from "../api/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setLoading(false);
         return;
       }
-      const userData = await authApi.getProfile();
+      const userData = await authService.getProfile();
       setUser(userData);
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -42,18 +42,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const login = async (username: string, password: string) => {
-    const data = await authApi.login({ username, password });
+    const data = await authService.login({ username, password });
     setUser(data.user);
   };
 
   const logout = async () => {
-    await authApi.logout();
+    await authService.logout();
     setUser(null);
   };
 
   const refreshUser = async () => {
     try {
-      const userData = await authApi.getProfile();
+      const userData = await authService.getProfile();
       setUser(userData);
     } catch (error) {
       console.error("Failed to refresh user:", error);

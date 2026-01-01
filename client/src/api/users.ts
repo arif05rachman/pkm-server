@@ -6,21 +6,21 @@ interface UpdateUserRequest {
   email?: string;
   role?: "admin" | "manager" | "user";
   is_active?: boolean;
-  id_karyawan?: number;
+  employee_id?: number;
 }
 
-export const usersApi = {
+export const userService = {
   getAll: async (page = 1, limit = 10): Promise<PaginatedResponse<User>> => {
     const response = await apiClient.get<ApiResponse<PaginatedResponse<User>>>(
       "/users",
       { params: { page, limit } }
     );
-    return response.data.data!;
+    return response.data.data;
   },
 
   getById: async (id: number): Promise<User> => {
     const response = await apiClient.get<ApiResponse<User>>(`/users/${id}`);
-    return response.data.data!;
+    return response.data.data;
   },
 
   update: async (id: number, data: UpdateUserRequest): Promise<User> => {
@@ -28,10 +28,12 @@ export const usersApi = {
       `/users/${id}`,
       data
     );
-    return response.data.data!;
+    return response.data.data;
   },
 
   delete: async (id: number): Promise<void> => {
     await apiClient.delete(`/users/${id}`);
   },
 };
+
+export default userService;

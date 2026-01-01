@@ -28,24 +28,17 @@ const isSupabasePooler = (connectionString?: string): boolean => {
 // Get database configuration
 const getDbConfig = (): PoolConfig => {
   // Priority: DATABASE_URL (recommended for Supabase + Vercel)
-  if (process.env.DATABASE_URL) {
+  if (process.env.DATABASE_URL && process.env.DATABASE_URL.trim() !== "") {
     const isPooler = isSupabasePooler(process.env.DATABASE_URL);
 
-    // Log connection info untuk debugging
-    if (isServerless) {
-      try {
-        const dbHost = process.env.DATABASE_URL.split("@")[1]?.split("/")[0];
-        console.log(`🔍 DB Connection: ${dbHost || "DATABASE_URL"}`);
-        if (isPooler) {
-          console.log("✅ Using Supabase Transaction Pooler (recommended)");
-        } else if (process.env.DATABASE_URL.includes("supabase.co")) {
-          console.warn(
-            "⚠️ WARNING: Using direct Supabase connection. Switch to Transaction Pooler!"
-          );
-        }
-      } catch (e) {
-        // Ignore parsing errors
-      }
+    // Log connection info for debugging
+    try {
+      const url = new URL(
+        process.env.DATABASE_URL.replace("postgresql://", "http://")
+      ); // Use URL parser safely
+      console.log(`🔍 Connecting via DATABASE_URL to host: ${url.hostname}`);
+    } catch (e) {
+      console.log(`🔍 Connecting via DATABASE_URL...`);
     }
 
     return {
@@ -53,15 +46,20 @@ const getDbConfig = (): PoolConfig => {
       ssl: process.env.DATABASE_URL.includes("localhost")
         ? false
         : { rejectUnauthorized: false },
-      max: 1, // WAJIB untuk Supabase free tier & serverless
+      max: 1, // Recommended for Supabase free tier & serverless
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 15000, // 15s untuk Supabase pooler
-      statement_timeout: 30000, // 30 seconds max query time
+      connectionTimeoutMillis: 15000,
+      statement_timeout: 30000,
       allowExitOnIdle: isServerless,
     };
   }
 
   // Fallback: individual connection parameters (untuk development)
+  console.log(
+    `🔍 Connecting via individual params to host: ${
+      process.env.DB_HOST || "localhost"
+    }`
+  );
   return {
     host: process.env.DB_HOST || "localhost",
     port: parseInt(process.env.DB_PORT || "5432"),

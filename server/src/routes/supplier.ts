@@ -1,38 +1,40 @@
 import { Router } from "express";
-import {
-  createSupplier,
-  getAllSupplier,
-  searchSupplier,
-  getSupplierById,
-  updateSupplierById,
-  deleteSupplierById,
-} from "@/controllers/supplierController";
-import { authenticateToken } from "@/middleware/auth";
-import { requireAdmin } from "@/middleware/permissions";
-import { asyncHandler } from "@/middleware/errorHandler";
+import * as supplierController from "@/controllers/supplierController";
+import { authenticate, authorize } from "@/middleware/auth";
 
 const router: Router = Router();
 
 // All routes require authentication
-router.use(authenticateToken);
+router.use(authenticate);
 
-// Search supplier (admin only)
-router.get("/search", requireAdmin, asyncHandler(searchSupplier));
+// Get all suppliers
+router.get("/", supplierController.getAllSuppliers);
 
-// Get all supplier (admin only)
-router.get("/", requireAdmin, asyncHandler(getAllSupplier));
+// Search suppliers
+router.get("/search", supplierController.searchSuppliers);
 
-// Create new supplier (admin only)
-router.post("/", requireAdmin, asyncHandler(createSupplier));
+// Get supplier by ID
+router.get("/:id", supplierController.getSupplierById);
 
-// Get supplier by ID (admin only)
-router.get("/:id", requireAdmin, asyncHandler(getSupplierById));
+// Create a new supplier
+router.post(
+  "/",
+  authorize(["admin", "manager"]),
+  supplierController.createSupplier
+);
 
-// Update supplier by ID (admin only)
-router.put("/:id", requireAdmin, asyncHandler(updateSupplierById));
+// Update supplier by ID
+router.put(
+  "/:id",
+  authorize(["admin", "manager"]),
+  supplierController.updateSupplierById
+);
 
-// Delete supplier by ID (admin only)
-router.delete("/:id", requireAdmin, asyncHandler(deleteSupplierById));
+// Delete supplier by ID
+router.delete(
+  "/:id",
+  authorize(["admin"]),
+  supplierController.deleteSupplierById
+);
 
 export default router;
-

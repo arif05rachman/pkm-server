@@ -22,6 +22,7 @@ import {
   FileTextOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
+  TagsOutlined,
 } from "@ant-design/icons";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -91,56 +92,68 @@ const DashboardLayout: React.FC = () => {
       label: "Dashboard",
     },
     {
-      key: "/dashboard/karyawan",
+      key: "/dashboard/employees",
       icon: <TeamOutlined />,
-      label: "Master Karyawan",
+      label: "Employees",
     },
     {
       key: "/dashboard/users",
       icon: <UsergroupAddOutlined />,
-      label: "Master Users",
+      label: "Users",
     },
     {
-      key: "/dashboard/barang",
+      key: "products_master",
       icon: <AppstoreOutlined />,
-      label: "Master Barang",
-    },
-    {
-      key: "/dashboard/supplier",
-      icon: <ShoppingCartOutlined />,
-      label: "Master Supplier",
-    },
-    {
-      key: "transaksi",
-      icon: <ImportOutlined />,
-      label: "Transaksi",
+      label: "Product Master",
       children: [
         {
-          key: "/dashboard/transaksi-masuk",
-          icon: <ImportOutlined />,
-          label: "Transaksi Masuk",
+          key: "/dashboard/products",
+          icon: <AppstoreOutlined />,
+          label: "Products",
         },
         {
-          key: "/dashboard/transaksi-keluar",
-          icon: <ExportOutlined />,
-          label: "Transaksi Keluar",
+          key: "/dashboard/categories",
+          icon: <TagsOutlined />,
+          label: "Categories",
         },
       ],
     },
     {
-      key: "laporan",
-      icon: <FileTextOutlined />,
-      label: "Laporan",
+      key: "/dashboard/suppliers",
+      icon: <ShoppingCartOutlined />,
+      label: "Suppliers",
+    },
+    {
+      key: "transactions",
+      icon: <ImportOutlined />,
+      label: "Transactions",
       children: [
         {
-          key: "/dashboard/laporan/kartu-stok",
-          icon: <FileTextOutlined />,
-          label: "Kartu Stok",
+          key: "/dashboard/stock-in",
+          icon: <ImportOutlined />,
+          label: "Stock In",
         },
         {
-          key: "/dashboard/laporan/transaksi",
+          key: "/dashboard/stock-out",
+          icon: <ExportOutlined />,
+          label: "Stock Out",
+        },
+      ],
+    },
+    {
+      key: "reports",
+      icon: <FileTextOutlined />,
+      label: "Reports",
+      children: [
+        {
+          key: "/dashboard/reports/stock-card",
           icon: <FileTextOutlined />,
-          label: "Laporan Transaksi",
+          label: "Stock Card",
+        },
+        {
+          key: "/dashboard/reports/transactions",
+          icon: <FileTextOutlined />,
+          label: "Transaction History",
         },
       ],
     },
@@ -159,7 +172,7 @@ const DashboardLayout: React.FC = () => {
     {
       key: "profile",
       icon: <UserOutlined />,
-      label: "Profil",
+      label: "Profile",
       onClick: () => navigate("/dashboard/profile"),
     },
     {
@@ -178,13 +191,19 @@ const DashboardLayout: React.FC = () => {
   const getSelectedKeys = () => {
     const path = location.pathname;
     if (
-      path.startsWith("/dashboard/transaksi-masuk") ||
-      path.startsWith("/dashboard/transaksi-keluar")
+      path.startsWith("/dashboard/stock-in") ||
+      path.startsWith("/dashboard/stock-out")
     ) {
-      return ["transaksi", path];
+      return ["transactions", path];
     }
-    if (path.startsWith("/dashboard/laporan")) {
-      return ["laporan", path];
+    if (path.startsWith("/dashboard/reports")) {
+      return ["reports", path];
+    }
+    if (
+      path.startsWith("/dashboard/products") ||
+      path.startsWith("/dashboard/categories")
+    ) {
+      return ["products_master", path];
     }
     return [path];
   };
@@ -240,7 +259,7 @@ const DashboardLayout: React.FC = () => {
             onClick={() => setCollapsed(!collapsed)}
           />
           <Text strong style={{ color: token.colorTextHeading, fontSize: 18 }}>
-            Sistem Inventory Management
+            Inventory Management System
           </Text>
 
           <Space size="middle">

@@ -51,10 +51,10 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       await login(values.username, values.password);
-      message.success("Login berhasil!");
+      message.success("Login successful!");
       navigate("/dashboard");
     } catch (error: unknown) {
-      let errorMessage = "Login gagal. Silakan coba lagi.";
+      let errorMessage = "Login failed. Please try again.";
       if (error && typeof error === "object" && "response" in error) {
         const response = (
           error as { response?: { data?: { message?: string } } }
@@ -75,10 +75,10 @@ const Login: React.FC = () => {
             level={2}
             style={{ marginBottom: 8, color: token.colorTextHeading }}
           >
-            Sistem Inventory
+            Inventory System
           </Title>
           <Text type="secondary" style={{ color: token.colorTextDescription }}>
-            Silakan login untuk melanjutkan
+            Please login to continue
           </Text>
         </div>
 
@@ -91,20 +91,20 @@ const Login: React.FC = () => {
         >
           <Form.Item
             name="username"
-            rules={[{ required: true, message: "Username wajib diisi!" }]}
+            rules={[{ required: true, message: "Username is required!" }]}
           >
             <Input
               prefix={
                 <UserOutlined style={{ color: token.colorTextDisabled }} />
               }
               placeholder="Username"
-              autoComplete="email"
+              autoComplete="username"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            rules={[{ required: true, message: "Password wajib diisi!" }]}
+            rules={[{ required: true, message: "Password is required!" }]}
           >
             <Input.Password
               prefix={
@@ -117,7 +117,7 @@ const Login: React.FC = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" block loading={loading}>
-              Login
+              Sign In
             </Button>
           </Form.Item>
         </Form>

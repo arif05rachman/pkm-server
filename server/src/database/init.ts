@@ -32,10 +32,10 @@ export const checkDatabaseTables = async (): Promise<boolean> => {
       SELECT table_name 
       FROM information_schema.tables 
       WHERE table_schema = 'public' 
-      AND table_name IN ('users', 'products')
+      AND table_name IN ('users', 'products', 'categories')
     `);
 
-    return result.rows.length >= 2;
+    return result.rows.length >= 3;
   } catch (error) {
     console.error("❌ Error checking database tables:", error);
     return false;
@@ -50,10 +50,15 @@ export const resetDatabase = async (): Promise<void> => {
     console.log("⚠️  Resetting database...");
 
     // Drop tables in reverse order (to handle foreign key constraints)
-    await pool.query("DROP TABLE IF EXISTS log_activity CASCADE");
-    await pool.query("DROP TABLE IF EXISTS role_permissions CASCADE");
-    await pool.query("DROP TABLE IF EXISTS permissions CASCADE");
+    await pool.query("DROP TABLE IF EXISTS activity_logs CASCADE");
+    await pool.query("DROP TABLE IF EXISTS stock_out_details CASCADE");
+    await pool.query("DROP TABLE IF EXISTS stock_outs CASCADE");
+    await pool.query("DROP TABLE IF EXISTS stock_in_details CASCADE");
+    await pool.query("DROP TABLE IF EXISTS stock_ins CASCADE");
+    await pool.query("DROP TABLE IF EXISTS suppliers CASCADE");
     await pool.query("DROP TABLE IF EXISTS products CASCADE");
+    await pool.query("DROP TABLE IF EXISTS categories CASCADE");
+    await pool.query("DROP TABLE IF EXISTS employees CASCADE");
     await pool.query("DROP TABLE IF EXISTS refresh_tokens CASCADE");
     await pool.query("DROP TABLE IF EXISTS users CASCADE");
     await pool.query(

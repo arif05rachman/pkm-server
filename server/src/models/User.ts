@@ -7,12 +7,12 @@ export class UserModel {
    * Create a new user
    */
   static async create(userData: CreateUserRequest): Promise<User> {
-    const { username, email, password, role = "user", id_karyawan } = userData;
+    const { username, email, password, role = "user", employee_id } = userData;
 
     const hashedPassword = await hashPassword(password);
 
     const query = `
-      INSERT INTO users (username, email, password, role, is_active, id_karyawan, created_at, updated_at)
+      INSERT INTO users (username, email, password, role, is_active, employee_id, created_at, updated_at)
       VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
       RETURNING *
     `;
@@ -23,7 +23,7 @@ export class UserModel {
       hashedPassword,
       role,
       true,
-      id_karyawan || null,
+      employee_id || null,
     ];
     const result = await pool.query(query, values);
 
@@ -80,7 +80,7 @@ export class UserModel {
 
     // Get users
     const query = `
-      SELECT id, username, email, role, is_active, id_karyawan, created_at, updated_at
+      SELECT id, username, email, role, is_active, employee_id, created_at, updated_at
       FROM users
       ORDER BY created_at DESC
       LIMIT $1 OFFSET $2
@@ -186,11 +186,11 @@ export class UserModel {
   }
 
   /**
-   * Find user by id_karyawan
+   * Find user by employee_id
    */
-  static async findByIdKaryawan(id_karyawan: number): Promise<User | null> {
-    const query = "SELECT * FROM users WHERE id_karyawan = $1";
-    const result = await pool.query(query, [id_karyawan]);
+  static async findByEmployeeId(employee_id: number): Promise<User | null> {
+    const query = "SELECT * FROM users WHERE employee_id = $1";
+    const result = await pool.query(query, [employee_id]);
 
     return result.rows[0] || null;
   }

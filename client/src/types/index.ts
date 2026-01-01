@@ -5,6 +5,7 @@ export interface User {
   email: string;
   role: "admin" | "manager" | "user";
   is_active: boolean;
+  employee_id: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -15,38 +16,49 @@ export interface LoginResponse {
   refreshToken: string;
 }
 
-// Barang types
-export interface Barang {
-  id_barang: number;
-  nama_barang: string;
-  satuan: "pcs" | "botol" | "tablet";
-  jenis: "Obat" | "Alkes" | "BMHP";
-  stok_minimal: number;
-  stok: number;
-  lokasi?: string;
+// Category types
+export interface Category {
+  id: number;
+  name: string;
+  description: string | null;
   created_at: string;
   updated_at: string;
 }
 
-// Karyawan types
-export interface Karyawan {
-  id_karyawan: number;
-  nama_karyawan: string;
-  jabatan: string;
+// Product types
+export interface Product {
+  id: number;
+  name: string;
+  unit: "pcs" | "bottle" | "tablet";
+  type: "Medicine" | "Medical Device" | "Medical Material";
+  category_id: number | null;
+  category_name?: string; // For display
+  min_stock: number;
+  stock: number;
+  location?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Employee types
+export interface Employee {
+  id: number;
+  name: string;
+  position: string;
   nip?: string;
-  no_hp?: string;
-  alamat?: string;
-  status_aktif: boolean;
+  phone?: string;
+  address?: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
 
 // Supplier types
 export interface Supplier {
-  id_supplier: number;
-  nama_supplier: string;
-  alamat?: string;
-  kontak?: string;
+  id: number;
+  name: string;
+  address?: string;
+  contact?: string;
   created_at: string;
   updated_at: string;
 }
@@ -76,51 +88,51 @@ export interface ApiError {
   message: string;
 }
 
-// Transaksi Masuk types
-export interface DetailTransaksiMasuk {
-  id_detail_masuk: number;
-  id_transaksi_masuk: number;
-  id_barang: number;
-  jumlah: number;
-  harga_satuan: number;
-  tanggal_kadaluarsa: string | null;
+// Stock In types
+export interface StockInDetail {
+  id: number;
+  stock_in_id: number;
+  product_id: number;
+  quantity: number;
+  unit_price: number;
+  expiry_date: string | null;
   created_at: string;
   updated_at: string;
-  nama_barang?: string; // For display
+  product_name?: string; // For display
 }
 
-export interface TransaksiMasuk {
-  id_transaksi_masuk: number;
-  tanggal_masuk: string;
-  id_supplier: number | null;
-  id_user: number | null;
-  keterangan: string | null;
+export interface StockIn {
+  id: number;
+  date: string;
+  supplier_id: number | null;
+  user_id: number | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
-  nama_supplier?: string; // For display
+  supplier_name?: string; // For display
   username?: string; // For display
-  details?: DetailTransaksiMasuk[];
+  details?: StockInDetail[];
 }
 
-// Transaksi Keluar types
-export interface DetailTransaksiKeluar {
-  id_detail_keluar: number;
-  id_transaksi_keluar: number;
-  id_barang: number;
-  jumlah: number;
+// Stock Out types
+export interface StockOutDetail {
+  id: number;
+  stock_out_id: number;
+  product_id: number;
+  quantity: number;
   created_at: string;
   updated_at: string;
-  nama_barang?: string; // For display
+  product_name?: string; // For display
 }
 
-export interface TransaksiKeluar {
-  id_transaksi_keluar: number;
-  tanggal_keluar: string;
-  tujuan: string;
-  id_user: number | null;
-  keterangan: string | null;
+export interface StockOut {
+  id: number;
+  date: string;
+  destination: string;
+  user_id: number | null;
+  description: string | null;
   created_at: string;
   updated_at: string;
   username?: string; // For display
-  details?: DetailTransaksiKeluar[];
+  details?: StockOutDetail[];
 }

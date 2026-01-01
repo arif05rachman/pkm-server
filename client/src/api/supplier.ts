@@ -1,30 +1,31 @@
-import apiClient from './client';
-import type { Supplier, ApiResponse, PaginatedResponse } from '../types';
+import apiClient from "./client";
+import type { Supplier, ApiResponse, PaginatedResponse } from "../types";
 
 interface CreateSupplierRequest {
-  nama_supplier: string;
-  alamat?: string;
-  kontak?: string;
+  name: string;
+  address?: string;
+  contact?: string;
 }
 
 interface UpdateSupplierRequest extends Partial<CreateSupplierRequest> {}
 
-export const supplierApi = {
+export const supplierService = {
   getAll: async (
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Supplier>> => {
     const params: any = { page, limit };
 
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Supplier>>>(
-      '/supplier',
-      { params }
-    );
+    const response = await apiClient.get<
+      ApiResponse<PaginatedResponse<Supplier>>
+    >("/suppliers", { params });
     return response.data.data;
   },
 
   getById: async (id: number): Promise<Supplier> => {
-    const response = await apiClient.get<ApiResponse<Supplier>>(`/supplier/${id}`);
+    const response = await apiClient.get<ApiResponse<Supplier>>(
+      `/suppliers/${id}`
+    );
     return response.data.data;
   },
 
@@ -33,25 +34,34 @@ export const supplierApi = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Supplier>> => {
-    const response = await apiClient.get<ApiResponse<PaginatedResponse<Supplier>>>(
-      '/supplier/search',
-      { params: { q: query, page, limit } }
-    );
+    const response = await apiClient.get<
+      ApiResponse<PaginatedResponse<Supplier>>
+    >("/suppliers/search", { params: { q: query, page, limit } });
     return response.data.data;
   },
 
   create: async (data: CreateSupplierRequest): Promise<Supplier> => {
-    const response = await apiClient.post<ApiResponse<Supplier>>('/supplier', data);
+    const response = await apiClient.post<ApiResponse<Supplier>>(
+      "/suppliers",
+      data
+    );
     return response.data.data;
   },
 
-  update: async (id: number, data: UpdateSupplierRequest): Promise<Supplier> => {
-    const response = await apiClient.put<ApiResponse<Supplier>>(`/supplier/${id}`, data);
+  update: async (
+    id: number,
+    data: UpdateSupplierRequest
+  ): Promise<Supplier> => {
+    const response = await apiClient.put<ApiResponse<Supplier>>(
+      `/suppliers/${id}`,
+      data
+    );
     return response.data.data;
   },
 
   delete: async (id: number): Promise<void> => {
-    await apiClient.delete(`/supplier/${id}`);
+    await apiClient.delete(`/suppliers/${id}`);
   },
 };
 
+export default supplierService;

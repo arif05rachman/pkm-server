@@ -5,25 +5,25 @@ import {
   updateUserById,
   deleteUserById,
 } from "@/controllers/userController";
-import { authenticateToken } from "@/middleware/auth";
-import { requireAdmin } from "@/middleware/permissions";
+import { authenticate, authorize } from "@/middleware/auth";
 import { asyncHandler } from "@/middleware/errorHandler";
 
 const router: Router = Router();
 
-// All routes require authentication
-router.use(authenticateToken);
+// All routes require authentication and admin role
+router.use(authenticate);
+router.use(authorize(["admin"]));
 
-// Get all users (admin only)
-router.get("/", requireAdmin, asyncHandler(getAllUsers));
+// Get all users
+router.get("/", asyncHandler(getAllUsers));
 
-// Get user by ID (admin only)
-router.get("/:id", requireAdmin, asyncHandler(getUserById));
+// Get user by ID
+router.get("/:id", asyncHandler(getUserById));
 
-// Update user by ID (admin only)
-router.put("/:id", requireAdmin, asyncHandler(updateUserById));
+// Update user by ID
+router.put("/:id", asyncHandler(updateUserById));
 
-// Delete user by ID (admin only)
-router.delete("/:id", requireAdmin, asyncHandler(deleteUserById));
+// Delete user by ID
+router.delete("/:id", asyncHandler(deleteUserById));
 
 export default router;

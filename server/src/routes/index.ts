@@ -1,11 +1,12 @@
 import { Router } from "express";
 import authRoutes from "./auth";
 import userRoutes from "./users";
-import karyawanRoutes from "./karyawan";
-import barangRoutes from "./barang";
+import employeeRoutes from "./employees";
+import productRoutes from "./products";
+import categoryRoutes from "./categories";
 import supplierRoutes from "./supplier";
-import transaksiMasukRoutes from "./transaksiMasuk";
-import transaksiKeluarRoutes from "./transaksiKeluar";
+import stockInRoutes from "./stockIn";
+import stockOutRoutes from "./stockOut";
 import reportRoutes from "./report";
 
 const router: Router = Router();
@@ -23,11 +24,12 @@ router.get("/health", (req, res) => {
 // API routes
 router.use("/auth", authRoutes);
 router.use("/users", userRoutes);
-router.use("/karyawan", karyawanRoutes);
-router.use("/barang", barangRoutes);
-router.use("/supplier", supplierRoutes);
-router.use("/transaksi-masuk", transaksiMasukRoutes);
-router.use("/transaksi-keluar", transaksiKeluarRoutes);
+router.use("/employees", employeeRoutes);
+router.use("/products", productRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/suppliers", supplierRoutes);
+router.use("/stock-in", stockInRoutes);
+router.use("/stock-out", stockOutRoutes);
 router.use("/reports", reportRoutes);
 
 // API documentation endpoint
@@ -54,59 +56,51 @@ router.get("/", (req, res) => {
         updateById: "PUT /api/users/:id",
         deleteById: "DELETE /api/users/:id",
       },
-      karyawan: {
-        getAll: "GET /api/karyawan",
-        search: "GET /api/karyawan/search?q=searchTerm",
-        getById: "GET /api/karyawan/:id",
-        create: "POST /api/karyawan",
-        updateById: "PUT /api/karyawan/:id",
-        deleteById: "DELETE /api/karyawan/:id",
-        hardDelete: "DELETE /api/karyawan/:id/hard",
+      employees: {
+        getAll: "GET /api/employees",
+        getById: "GET /api/employees/:id",
+        create: "POST /api/employees",
+        updateById: "PUT /api/employees/:id",
+        deleteById: "DELETE /api/employees/:id",
       },
-      barang: {
-        getAll: "GET /api/barang",
-        search: "GET /api/barang/search?q=searchTerm",
-        getById: "GET /api/barang/:id",
-        create: "POST /api/barang",
-        updateById: "PUT /api/barang/:id",
-        deleteById: "DELETE /api/barang/:id",
+      products: {
+        getAll: "GET /api/products",
+        search: "GET /api/products/search?q=searchTerm",
+        getById: "GET /api/products/:id",
+        create: "POST /api/products",
+        updateById: "PUT /api/products/:id",
+        deleteById: "DELETE /api/products/:id",
       },
-      supplier: {
-        getAll: "GET /api/supplier",
-        search: "GET /api/supplier/search?q=searchTerm",
-        getById: "GET /api/supplier/:id",
-        create: "POST /api/supplier",
-        updateById: "PUT /api/supplier/:id",
-        deleteById: "DELETE /api/supplier/:id",
+      categories: {
+        getAll: "GET /api/categories",
+        search: "GET /api/categories/search?q=searchTerm",
+        getById: "GET /api/categories/:id",
+        create: "POST /api/categories",
+        updateById: "PUT /api/categories/:id",
+        deleteById: "DELETE /api/categories/:id",
       },
-      transaksiMasuk: {
-        getAll: "GET /api/transaksi-masuk",
-        getById: "GET /api/transaksi-masuk/:id",
-        create: "POST /api/transaksi-masuk",
-        updateById: "PUT /api/transaksi-masuk/:id",
-        deleteById: "DELETE /api/transaksi-masuk/:id",
-        addDetail: "POST /api/transaksi-masuk/:id/details",
-        updateDetail: "PUT /api/transaksi-masuk/:id/details/:detailId",
-        deleteDetail: "DELETE /api/transaksi-masuk/:id/details/:detailId",
+      suppliers: {
+        getAll: "GET /api/suppliers",
+        getById: "GET /api/suppliers/:id",
+        create: "POST /api/suppliers",
+        updateById: "PUT /api/suppliers/:id",
+        deleteById: "DELETE /api/suppliers/:id",
       },
-      transaksiKeluar: {
-        getAll: "GET /api/transaksi-keluar",
-        getById: "GET /api/transaksi-keluar/:id",
-        create: "POST /api/transaksi-keluar",
-        updateById: "PUT /api/transaksi-keluar/:id",
-        deleteById: "DELETE /api/transaksi-keluar/:id",
-        addDetail: "POST /api/transaksi-keluar/:id/details",
-        updateDetail: "PUT /api/transaksi-keluar/:id/details/:detailId",
-        deleteDetail: "DELETE /api/transaksi-keluar/:id/details/:detailId",
+      stockIn: {
+        getAll: "GET /api/stock-in",
+        getById: "GET /api/stock-in/:id",
+        create: "POST /api/stock-in",
+        deleteById: "DELETE /api/stock-in/:id",
       },
-      logActivity: {
-        getAll: "GET /api/logs",
-        search: "GET /api/logs/search?q=searchTerm",
-        getById: "GET /api/logs/:id",
-        getByUserId: "GET /api/logs/user/:userId",
-        getStatistics: "GET /api/logs/statistics",
-        create: "POST /api/logs",
-        deleteOldLogs: "DELETE /api/logs/cleanup?daysOld=90",
+      stockOut: {
+        getAll: "GET /api/stock-out",
+        getById: "GET /api/stock-out/:id",
+        create: "POST /api/stock-out",
+        deleteById: "DELETE /api/stock-out/:id",
+      },
+      reports: {
+        stockLevel: "GET /api/reports/stock-level",
+        transactions: "GET /api/reports/transactions",
       },
     },
   });

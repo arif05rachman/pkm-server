@@ -11,10 +11,11 @@ import {
   Row,
   Col,
   Tabs,
+  Tag,
 } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
-import { authApi } from "../../api/auth";
+import authService from "../../api/auth";
 import { formatDate } from "../../utils/formatters";
 import styled from "@emotion/styled";
 
@@ -38,11 +39,13 @@ const Profile: React.FC = () => {
   const handleUpdateProfile = async (values: any) => {
     setLoading(true);
     try {
-      await authApi.updateProfile(values);
+      await authService.updateProfile(values);
       await refreshUser();
-      message.success("Profil berhasil diupdate");
+      message.success("Profile updated successfully");
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Gagal mengupdate profil");
+      message.error(
+        error.response?.data?.message || "Failed to update profile"
+      );
     } finally {
       setLoading(false);
     }
@@ -51,11 +54,13 @@ const Profile: React.FC = () => {
   const handleChangePassword = async (values: any) => {
     setLoading(true);
     try {
-      await authApi.changePassword(values);
+      await authService.changePassword(values);
       passwordForm.resetFields();
-      message.success("Password berhasil diubah");
+      message.success("Password changed successfully");
     } catch (error: any) {
-      message.error(error.response?.data?.message || "Gagal mengubah password");
+      message.error(
+        error.response?.data?.message || "Failed to change password"
+      );
     } finally {
       setLoading(false);
     }
@@ -66,7 +71,7 @@ const Profile: React.FC = () => {
   const tabItems = [
     {
       key: "profile",
-      label: "Informasi Profil",
+      label: "Profile Information",
       children: (
         <Form
           form={profileForm}
@@ -82,7 +87,7 @@ const Profile: React.FC = () => {
               <Form.Item
                 name="username"
                 label="Username"
-                rules={[{ required: true, message: "Username wajib diisi" }]}
+                rules={[{ required: true, message: "Username is required" }]}
               >
                 <Input prefix={<UserOutlined />} placeholder="Username" />
               </Form.Item>
@@ -92,8 +97,8 @@ const Profile: React.FC = () => {
                 name="email"
                 label="Email"
                 rules={[
-                  { required: true, message: "Email wajib diisi" },
-                  { type: "email", message: "Format email tidak valid" },
+                  { required: true, message: "Email is required" },
+                  { type: "email", message: "Invalid email format" },
                 ]}
               >
                 <Input prefix={<MailOutlined />} placeholder="Email" />
@@ -103,7 +108,7 @@ const Profile: React.FC = () => {
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Simpan Perubahan
+              Save Changes
             </Button>
           </Form.Item>
         </Form>
@@ -111,7 +116,7 @@ const Profile: React.FC = () => {
     },
     {
       key: "password",
-      label: "Ubah Password",
+      label: "Change Password",
       children: (
         <Form
           form={passwordForm}
@@ -120,34 +125,34 @@ const Profile: React.FC = () => {
         >
           <Form.Item
             name="currentPassword"
-            label="Password Saat Ini"
+            label="Current Password"
             rules={[
-              { required: true, message: "Password saat ini wajib diisi" },
+              { required: true, message: "Current password is required" },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password Saat Ini"
+              placeholder="Current Password"
             />
           </Form.Item>
 
           <Form.Item
             name="newPassword"
-            label="Password Baru"
+            label="New Password"
             rules={[
-              { required: true, message: "Password baru wajib diisi" },
-              { min: 8, message: "Password minimal 8 karakter" },
+              { required: true, message: "New password is required" },
+              { min: 8, message: "Password must be at least 8 characters" },
             ]}
           >
             <Input.Password
               prefix={<LockOutlined />}
-              placeholder="Password Baru"
+              placeholder="New Password"
             />
           </Form.Item>
 
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={loading}>
-              Ubah Password
+              Change Password
             </Button>
           </Form.Item>
         </Form>
@@ -157,7 +162,7 @@ const Profile: React.FC = () => {
 
   return (
     <ProfileContainer>
-      <Title level={2}>Profil Pengguna</Title>
+      <Title level={2}>User Profile</Title>
 
       <Card>
         <div className="profile-header">
@@ -178,22 +183,26 @@ const Profile: React.FC = () => {
           <Row gutter={16}>
             <Col span={12}>
               <Typography.Text type="secondary">Role:</Typography.Text>
-              <div style={{ fontWeight: "bold" }}>{user.role}</div>
+              <div style={{ fontWeight: "bold" }}>
+                <Tag color="gold">{user.role?.toUpperCase()}</Tag>
+              </div>
             </Col>
             <Col span={12}>
               <Typography.Text type="secondary">Status:</Typography.Text>
               <div style={{ fontWeight: "bold" }}>
-                {user.is_active ? "Aktif" : "Tidak Aktif"}
+                {user.is_active ? (
+                  <Tag color="success">ACTIVE</Tag>
+                ) : (
+                  <Tag color="error">INACTIVE</Tag>
+                )}
               </div>
             </Col>
             <Col span={12} style={{ marginTop: 16 }}>
-              <Typography.Text type="secondary">Terdaftar:</Typography.Text>
+              <Typography.Text type="secondary">Member Since:</Typography.Text>
               <div>{formatDate(user.created_at)}</div>
             </Col>
             <Col span={12} style={{ marginTop: 16 }}>
-              <Typography.Text type="secondary">
-                Terakhir Diupdate:
-              </Typography.Text>
+              <Typography.Text type="secondary">Last Updated:</Typography.Text>
               <div>{formatDate(user.updated_at)}</div>
             </Col>
           </Row>

@@ -45,10 +45,10 @@ export const errorHandler = (
   let isOperational = false;
 
   // Handle known error types
-  if (error instanceof AppError) {
-    statusCode = error.statusCode;
+  if (error instanceof AppError || (error as any).statusCode) {
+    statusCode = (error as any).statusCode || 500;
     message = error.message;
-    isOperational = error.isOperational;
+    isOperational = (error as any).isOperational || false;
   } else if (error.name === "ValidationError") {
     statusCode = 400;
     message = "Validation Error";

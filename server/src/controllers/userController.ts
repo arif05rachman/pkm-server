@@ -56,7 +56,7 @@ export const getUserById = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
-        id_karyawan: user.id_karyawan,
+        employee_id: user.employee_id,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -72,7 +72,7 @@ export const getUserById = asyncHandler(
 export const updateUserById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const userId = parseInt(req.params.id);
-    const { username, email, role, is_active, id_karyawan } = req.body;
+    const { username, email, role, is_active, employee_id } = req.body;
 
     if (isNaN(userId)) {
       throw new AppError("Invalid user ID", 400);
@@ -101,7 +101,7 @@ export const updateUserById = asyncHandler(
       updateData.role = role;
     }
     if (is_active !== undefined) updateData.is_active = is_active;
-    if (id_karyawan !== undefined) updateData.id_karyawan = id_karyawan;
+    if (employee_id !== undefined) updateData.employee_id = employee_id;
 
     if (Object.keys(updateData).length === 0) {
       throw new AppError("No valid fields to update", 400);
@@ -137,7 +137,7 @@ export const updateUserById = asyncHandler(
         email: updatedUser.email,
         role: updatedUser.role,
         is_active: updatedUser.is_active,
-        id_karyawan: updatedUser.id_karyawan,
+        employee_id: updatedUser.employee_id,
         created_at: updatedUser.created_at,
         updated_at: updatedUser.updated_at,
       },

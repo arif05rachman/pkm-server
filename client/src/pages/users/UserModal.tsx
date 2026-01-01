@@ -1,79 +1,86 @@
 import React from "react";
-import { Modal, Form, Input, Select, Switch, type FormInstance } from "antd";
-import type { User } from "../../types";
+import { Modal, Form, Input, Select, Switch } from "antd";
+import type { FormInstance } from "antd";
+import type { User, Employee } from "../../types";
 
 interface UserModalProps {
   open: boolean;
-  editingUser: User | null;
+  editingItem: User | null;
+  employees: Employee[];
   onCancel: () => void;
-  onSubmit: () => Promise<void>;
+  onSubmit: (values: any) => void;
   form: FormInstance;
 }
 
 const UserModal: React.FC<UserModalProps> = ({
   open,
-  editingUser,
+  editingItem,
+  employees,
   onCancel,
   onSubmit,
   form,
 }) => {
-  // useEffect removed as form values are controlled by hook
-
   return (
     <Modal
-      title={editingUser ? "Edit User" : "Tambah User"}
+      title="Edit User"
       open={open}
-      onOk={onSubmit}
       onCancel={onCancel}
-      width={600}
+      onOk={() => form.submit()}
+      destroyOnClose
     >
-      <Form form={form} layout="vertical">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onSubmit}
+        initialValues={editingItem || {}}
+      >
         <Form.Item
           name="username"
           label="Username"
-          rules={[{ required: true, message: "Username wajib diisi" }]}
+          rules={[{ required: true, message: "Please input username!" }]}
         >
-          <Input placeholder="Username" />
+          <Input placeholder="Enter username" />
         </Form.Item>
 
         <Form.Item
           name="email"
           label="Email"
           rules={[
-            { required: true, message: "Email wajib diisi" },
-            { type: "email", message: "Format email tidak valid" },
+            { required: true, message: "Please input email!" },
+            { type: "email", message: "Please enter a valid email!" },
           ]}
         >
-          <Input placeholder="Email" />
+          <Input placeholder="Enter email address" />
         </Form.Item>
-
-        {!editingUser && (
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: "Password wajib diisi" },
-              { min: 6, message: "Password minimal 6 karakter" },
-            ]}
-          >
-            <Input.Password placeholder="Password" />
-          </Form.Item>
-        )}
 
         <Form.Item
           name="role"
           label="Role"
-          rules={[{ required: true, message: "Role wajib diisi" }]}
+          rules={[{ required: true, message: "Please select role!" }]}
         >
-          <Select placeholder="Pilih Role">
+          <Select placeholder="Select user role">
             <Select.Option value="admin">Admin</Select.Option>
             <Select.Option value="manager">Manager</Select.Option>
             <Select.Option value="user">User</Select.Option>
           </Select>
         </Form.Item>
 
-        <Form.Item name="is_active" label="Status" valuePropName="checked">
-          <Switch checkedChildren="Aktif" unCheckedChildren="Tidak Aktif" />
+        <Form.Item name="employee_id" label="Link to Employee">
+          <Select placeholder="Select employee" allowClear>
+            {employees.map((emp) => (
+              <Select.Option key={emp.id} value={emp.id}>
+                {emp.name} ({emp.position})
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="is_active"
+          label="Status Active"
+          valuePropName="checked"
+        >
+          <Switch />
         </Form.Item>
       </Form>
     </Modal>

@@ -14,29 +14,28 @@ import {
  */
 export const createSupplier = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const { nama_supplier, alamat, kontak } =
-      req.body as CreateSupplierRequest;
+    const { name, address, contact } = req.body as CreateSupplierRequest;
 
     // Validate required fields
-    if (!nama_supplier) {
-      throw new AppError("Nama supplier wajib diisi", 400);
+    if (!name) {
+      throw new AppError("Supplier name is required", 400);
     }
 
-    // Check if nama_supplier already exists
-    const existingSupplier = await SupplierModel.namaSupplierExists(nama_supplier);
+    // Check if name already exists
+    const existingSupplier = await SupplierModel.nameExists(name);
     if (existingSupplier) {
-      throw new AppError("Nama supplier sudah terdaftar", 409);
+      throw new AppError("Supplier name already registered", 409);
     }
 
     const supplier = await SupplierModel.create({
-      nama_supplier,
-      alamat,
-      kontak,
+      name,
+      address,
+      contact,
     });
 
     const response: ApiResponse<Supplier> = {
       success: true,
-      message: "Supplier berhasil dibuat",
+      message: "Supplier created successfully",
       data: supplier,
     };
 
@@ -45,9 +44,9 @@ export const createSupplier = asyncHandler(
 );
 
 /**
- * Get all supplier with pagination
+ * Get all suppliers with pagination
  */
-export const getAllSupplier = asyncHandler(
+export const getAllSuppliers = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -55,7 +54,7 @@ export const getAllSupplier = asyncHandler(
     const result = await SupplierModel.findAll(page, limit);
 
     const response: PaginatedResponse<Supplier> = {
-      data: result.supplier,
+      data: result.suppliers,
       pagination: {
         page,
         limit,
@@ -66,29 +65,29 @@ export const getAllSupplier = asyncHandler(
 
     res.json({
       success: true,
-      message: "Data supplier berhasil diambil",
+      message: "Suppliers data retrieved successfully",
       data: response,
     });
   }
 );
 
 /**
- * Search supplier by name, alamat, or kontak
+ * Search suppliers by name, address, or contact
  */
-export const searchSupplier = asyncHandler(
+export const searchSuppliers = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const searchTerm = req.query.q as string;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
 
     if (!searchTerm) {
-      throw new AppError("Parameter pencarian (q) wajib diisi", 400);
+      throw new AppError("Search term (q) is required", 400);
     }
 
     const result = await SupplierModel.search(searchTerm, page, limit);
 
     const response: PaginatedResponse<Supplier> = {
-      data: result.supplier,
+      data: result.suppliers,
       pagination: {
         page,
         limit,
@@ -99,7 +98,7 @@ export const searchSupplier = asyncHandler(
 
     res.json({
       success: true,
-      message: "Hasil pencarian supplier",
+      message: "Suppliers search results retrieved",
       data: response,
     });
   }
@@ -110,20 +109,20 @@ export const searchSupplier = asyncHandler(
  */
 export const getSupplierById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const id_supplier = parseInt(req.params.id);
+    const supplierId = parseInt(req.params.id);
 
-    if (isNaN(id_supplier)) {
-      throw new AppError("ID supplier tidak valid", 400);
+    if (isNaN(supplierId)) {
+      throw new AppError("Invalid supplier ID", 400);
     }
 
-    const supplier = await SupplierModel.findById(id_supplier);
+    const supplier = await SupplierModel.findById(supplierId);
     if (!supplier) {
-      throw new AppError("Supplier tidak ditemukan", 404);
+      throw new AppError("Supplier not found", 404);
     }
 
     const response: ApiResponse<Supplier> = {
       success: true,
-      message: "Data supplier berhasil diambil",
+      message: "Supplier data retrieved successfully",
       data: supplier,
     };
 
@@ -136,44 +135,46 @@ export const getSupplierById = asyncHandler(
  */
 export const updateSupplierById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const id_supplier = parseInt(req.params.id);
-    const { nama_supplier, alamat, kontak } =
-      req.body as UpdateSupplierRequest;
+    const supplierId = parseInt(req.params.id);
+    const { name, address, contact } = req.body as UpdateSupplierRequest;
 
-    if (isNaN(id_supplier)) {
-      throw new AppError("ID supplier tidak valid", 400);
+    if (isNaN(supplierId)) {
+      throw new AppError("Invalid supplier ID", 400);
     }
 
-    const existingSupplier = await SupplierModel.findById(id_supplier);
+    const existingSupplier = await SupplierModel.findById(supplierId);
     if (!existingSupplier) {
-      throw new AppError("Supplier tidak ditemukan", 404);
+      throw new AppError("Supplier not found", 404);
     }
 
-    // Check if nama_supplier is already taken by another supplier
-    if (nama_supplier && nama_supplier !== existingSupplier.nama_supplier) {
-      const namaExists = await SupplierModel.namaSupplierExists(nama_supplier, id_supplier);
-      if (namaExists) {
-        throw new AppError("Nama supplier sudah digunakan oleh supplier lain", 409);
+    // Check if name is already taken by another supplier
+    if (name && name !== existingSupplier.name) {
+      const nameExists = await SupplierModel.nameExists(name, supplierId);
+      if (nameExists) {
+        throw new AppError(
+          "Supplier name already used by another supplier",
+          409
+        );
       }
     }
 
     const updateData: UpdateSupplierRequest = {};
-    if (nama_supplier !== undefined) updateData.nama_supplier = nama_supplier;
-    if (alamat !== undefined) updateData.alamat = alamat;
-    if (kontak !== undefined) updateData.kontak = kontak;
+    if (name !== undefined) updateData.name = name;
+    if (address !== undefined) updateData.address = address;
+    if (contact !== undefined) updateData.contact = contact;
 
     if (Object.keys(updateData).length === 0) {
-      throw new AppError("Tidak ada data yang akan diupdate", 400);
+      throw new AppError("No data provided to update", 400);
     }
 
-    const updatedSupplier = await SupplierModel.update(id_supplier, updateData);
+    const updatedSupplier = await SupplierModel.update(supplierId, updateData);
     if (!updatedSupplier) {
-      throw new AppError("Gagal mengupdate supplier", 500);
+      throw new AppError("Failed to update supplier", 500);
     }
 
     const response: ApiResponse<Supplier> = {
       success: true,
-      message: "Supplier berhasil diupdate",
+      message: "Supplier updated successfully",
       data: updatedSupplier,
     };
 
@@ -186,26 +187,25 @@ export const updateSupplierById = asyncHandler(
  */
 export const deleteSupplierById = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const id_supplier = parseInt(req.params.id);
+    const supplierId = parseInt(req.params.id);
 
-    if (isNaN(id_supplier)) {
-      throw new AppError("ID supplier tidak valid", 400);
+    if (isNaN(supplierId)) {
+      throw new AppError("Invalid supplier ID", 400);
     }
 
-    const supplier = await SupplierModel.findById(id_supplier);
+    const supplier = await SupplierModel.findById(supplierId);
     if (!supplier) {
-      throw new AppError("Supplier tidak ditemukan", 404);
+      throw new AppError("Supplier not found", 404);
     }
 
-    const success = await SupplierModel.delete(id_supplier);
+    const success = await SupplierModel.delete(supplierId);
     if (!success) {
-      throw new AppError("Gagal menghapus supplier", 500);
+      throw new AppError("Failed to delete supplier", 500);
     }
 
     res.json({
       success: true,
-      message: "Supplier berhasil dihapus",
+      message: "Supplier deleted successfully",
     });
   }
 );
-

@@ -18,14 +18,14 @@ interface ChangePasswordRequest {
   newPassword: string;
 }
 
-export const authApi = {
+export const authService = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
       "/auth/login",
       credentials
     );
     if (response.data.success) {
-      const data = response.data.data as LoginResponse;
+      const data = response.data.data;
       localStorage.setItem("accessToken", data.token);
       localStorage.setItem("refreshToken", data.refreshToken);
       return data;
@@ -95,11 +95,13 @@ export const authApi = {
       "/auth/refresh",
       { refreshToken }
     );
-    if (response.data.success && "data" in response.data) {
-      const data = response.data.data as { token: string };
+    if (response.data.success && response.data.data) {
+      const data = response.data.data;
       localStorage.setItem("accessToken", data.token);
       return data.token;
     }
     throw new Error(response.data.message || "Failed to refresh token");
   },
 };
+
+export default authService;

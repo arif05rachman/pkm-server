@@ -8,7 +8,7 @@ export interface User {
   password: string;
   role: "admin" | "user" | "manager";
   is_active: boolean;
-  id_karyawan: number | null;
+  employee_id: number | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -18,7 +18,7 @@ export interface CreateUserRequest {
   email: string;
   password: string;
   role?: "admin" | "user" | "manager";
-  id_karyawan?: number;
+  employee_id?: number;
 }
 
 export interface LoginRequest {
@@ -86,188 +86,210 @@ export interface PaginatedResponse<T> {
   };
 }
 
-// Karyawan types
-export interface Karyawan {
-  id_karyawan: number;
-  nama_karyawan: string;
-  jabatan: string;
+// Employee types
+export interface Employee {
+  id: number;
+  name: string;
+  position: string;
   nip: string | null;
-  no_hp: string | null;
-  alamat: string | null;
-  status_aktif: boolean;
+  phone: string | null;
+  address: string | null;
+  is_active: boolean;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface CreateKaryawanRequest {
-  nama_karyawan: string;
-  jabatan: string;
+export interface CreateEmployeeRequest {
+  name: string;
+  position: string;
   nip?: string;
-  no_hp?: string;
-  alamat?: string;
-  status_aktif?: boolean;
+  phone?: string;
+  address?: string;
+  is_active?: boolean;
 }
 
-export interface UpdateKaryawanRequest {
-  nama_karyawan?: string;
-  jabatan?: string;
+export interface UpdateEmployeeRequest {
+  name?: string;
+  position?: string;
   nip?: string;
-  no_hp?: string;
-  alamat?: string;
-  status_aktif?: boolean;
+  phone?: string;
+  address?: string;
+  is_active?: boolean;
 }
 
-// Barang types
-export interface Barang {
-  id_barang: number;
-  nama_barang: string;
-  satuan: "pcs" | "botol" | "tablet";
-  jenis: "Obat" | "Alkes" | "BMHP";
-  stok_minimal: number;
-  stok: number;
-  lokasi: string | null;
+// Category types
+export interface Category {
+  id: number;
+  name: string;
+  description: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface CreateBarangRequest {
-  nama_barang: string;
-  satuan: "pcs" | "botol" | "tablet";
-  jenis: "Obat" | "Alkes" | "BMHP";
-  stok_minimal?: number;
-  lokasi?: string;
+export interface CreateCategoryRequest {
+  name: string;
+  description?: string;
 }
 
-export interface UpdateBarangRequest {
-  nama_barang?: string;
-  satuan?: "pcs" | "botol" | "tablet";
-  jenis?: "Obat" | "Alkes" | "BMHP";
-  stok_minimal?: number;
-  lokasi?: string;
+export interface UpdateCategoryRequest {
+  name?: string;
+  description?: string;
+}
+
+// Product types
+export interface Product {
+  id: number;
+  name: string;
+  unit: "pcs" | "bottle" | "tablet";
+  type: "Medicine" | "Medical Device" | "Medical Material";
+  category_id: number | null;
+  min_stock: number;
+  stock: number;
+  location: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface CreateProductRequest {
+  name: string;
+  unit: "pcs" | "bottle" | "tablet";
+  type: "Medicine" | "Medical Device" | "Medical Material";
+  category_id?: number;
+  min_stock?: number;
+  location?: string;
+}
+
+export interface UpdateProductRequest {
+  name?: string;
+  unit?: "pcs" | "bottle" | "tablet";
+  type?: "Medicine" | "Medical Device" | "Medical Material";
+  category_id?: number;
+  min_stock?: number;
+  location?: string;
 }
 
 // Supplier types
 export interface Supplier {
-  id_supplier: number;
-  nama_supplier: string;
-  alamat: string | null;
-  kontak: string | null;
+  id: number;
+  name: string;
+  address: string | null;
+  contact: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
 export interface CreateSupplierRequest {
-  nama_supplier: string;
-  alamat?: string;
-  kontak?: string;
+  name: string;
+  address?: string;
+  contact?: string;
 }
 
 export interface UpdateSupplierRequest {
-  nama_supplier?: string;
-  alamat?: string;
-  kontak?: string;
+  name?: string;
+  address?: string;
+  contact?: string;
 }
 
-// Transaksi Masuk types
-export interface TransaksiMasuk {
-  id_transaksi_masuk: number;
-  tanggal_masuk: Date;
-  id_supplier: number | null;
-  id_user: number | null;
-  keterangan: string | null;
+// Stock In types
+export interface StockIn {
+  id: number;
+  date: Date;
+  supplier_id: number | null;
+  user_id: number | null;
+  description: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface DetailTransaksiMasuk {
-  id_detail_masuk: number;
-  id_transaksi_masuk: number;
-  id_barang: number;
-  jumlah: number;
-  harga_satuan: number;
-  tanggal_kadaluarsa: Date | null;
+export interface StockInDetail {
+  id: number;
+  stock_in_id: number;
+  product_id: number;
+  quantity: number;
+  unit_price: number;
+  expiry_date: Date | null;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface TransaksiMasukWithDetails extends TransaksiMasuk {
-  details: DetailTransaksiMasuk[];
+export interface StockInWithDetails extends StockIn {
+  details: StockInDetail[];
 }
 
-export interface CreateTransaksiMasukRequest {
-  tanggal_masuk: string;
-  id_supplier?: number;
-  id_user?: number;
-  keterangan?: string;
-  details: CreateDetailTransaksiMasukRequest[];
+export interface CreateStockInRequest {
+  date: string;
+  supplier_id?: number;
+  user_id?: number;
+  description?: string;
+  details: CreateStockInDetailRequest[];
 }
 
-export interface CreateDetailTransaksiMasukRequest {
-  id_barang: number;
-  jumlah: number;
-  harga_satuan: number;
-  tanggal_kadaluarsa?: string;
+export interface CreateStockInDetailRequest {
+  product_id: number;
+  quantity: number;
+  unit_price: number;
+  expiry_date?: string;
 }
 
-export interface UpdateTransaksiMasukRequest {
-  tanggal_masuk?: string;
-  id_supplier?: number;
-  id_user?: number;
-  keterangan?: string;
+export interface UpdateStockInRequest {
+  date?: string;
+  supplier_id?: number;
+  user_id?: number;
+  description?: string;
 }
 
-export interface UpdateDetailTransaksiMasukRequest {
-  id_barang?: number;
-  jumlah?: number;
-  harga_satuan?: number;
-  tanggal_kadaluarsa?: string;
+export interface UpdateStockInDetailRequest {
+  product_id?: number;
+  quantity?: number;
+  unit_price?: number;
+  expiry_date?: string;
 }
 
-// Transaksi Keluar types
-export interface TransaksiKeluar {
-  id_transaksi_keluar: number;
-  tanggal_keluar: Date;
-  tujuan: string;
-  id_user: number | null;
-  keterangan: string | null;
+// Stock Out types
+export interface StockOut {
+  id: number;
+  date: Date;
+  destination: string;
+  user_id: number | null;
+  description: string | null;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface DetailTransaksiKeluar {
-  id_detail_keluar: number;
-  id_transaksi_keluar: number;
-  id_barang: number;
-  jumlah: number;
+export interface StockOutDetail {
+  id: number;
+  stock_out_id: number;
+  product_id: number;
+  quantity: number;
   created_at: Date;
   updated_at: Date;
 }
 
-export interface TransaksiKeluarWithDetails extends TransaksiKeluar {
-  details: DetailTransaksiKeluar[];
+export interface StockOutWithDetails extends StockOut {
+  details: StockOutDetail[];
 }
 
-export interface CreateTransaksiKeluarRequest {
-  tanggal_keluar: string;
-  tujuan: string;
-  id_user?: number;
-  keterangan?: string;
-  details: CreateDetailTransaksiKeluarRequest[];
+export interface CreateStockOutRequest {
+  date: string;
+  destination: string;
+  user_id?: number;
+  description?: string;
+  details: CreateStockOutDetailRequest[];
 }
 
-export interface CreateDetailTransaksiKeluarRequest {
-  id_barang: number;
-  jumlah: number;
+export interface CreateStockOutDetailRequest {
+  product_id: number;
+  quantity: number;
 }
 
-export interface UpdateTransaksiKeluarRequest {
-  tanggal_keluar?: string;
-  tujuan?: string;
-  id_user?: number;
-  keterangan?: string;
+export interface UpdateStockOutRequest {
+  date?: string;
+  destination?: string;
+  user_id?: number;
+  description?: string;
 }
 
-export interface UpdateDetailTransaksiKeluarRequest {
-  id_barang?: number;
-  jumlah?: number;
+export interface UpdateStockOutDetailRequest {
+  product_id?: number;
+  quantity?: number;
 }

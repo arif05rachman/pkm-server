@@ -6,18 +6,18 @@ import Login from "./pages/auth/Login";
 
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/dashboard/Dashboard";
-import BarangList from "./pages/barang/BarangList";
-import KaryawanList from "./pages/karyawan/KaryawanList";
-import SupplierList from "./pages/supplier/SupplierList";
+import ProductList from "./pages/products/ProductList";
+import CategoryList from "./pages/categories/CategoryList";
+import EmployeeList from "./pages/employees/EmployeeList";
+import SupplierList from "./pages/suppliers/SupplierList";
 import UserList from "./pages/users/UserList";
-
-import TransaksiMasukList from "./pages/transaksi/TransaksiMasukList";
-import TransaksiKeluarList from "./pages/transaksi/TransaksiKeluarList";
-import StockCard from "./pages/report/StockCard";
-import TransactionReport from "./pages/report/TransactionReport";
+import StockInList from "./pages/transactions/StockInList";
+import StockOutList from "./pages/transactions/StockOutList";
+import StockCard from "./pages/reports/StockCard";
+import TransactionHistory from "./pages/reports/TransactionHistory";
 import Profile from "./pages/profile/Profile";
 import NotFound from "./pages/NotFound";
-import "dayjs/locale/id";
+import "dayjs/locale/en";
 
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { getThemeConfig } from "./utils/theme";
@@ -72,23 +72,18 @@ const AppContent: React.FC = () => {
                 }
               >
                 <Route index element={<Dashboard />} />
-                <Route path="barang" element={<BarangList />} />
-                <Route path="karyawan" element={<KaryawanList />} />
-                <Route path="supplier" element={<SupplierList />} />
+                <Route path="products" element={<ProductList />} />
+                <Route path="categories" element={<CategoryList />} />
+                <Route path="employees" element={<EmployeeList />} />
+                <Route path="suppliers" element={<SupplierList />} />
                 <Route path="users" element={<UserList />} />
 
+                <Route path="stock-in" element={<StockInList />} />
+                <Route path="stock-out" element={<StockOutList />} />
+                <Route path="reports/stock-card" element={<StockCard />} />
                 <Route
-                  path="transaksi-masuk"
-                  element={<TransaksiMasukList />}
-                />
-                <Route
-                  path="transaksi-keluar"
-                  element={<TransaksiKeluarList />}
-                />
-                <Route path="laporan/kartu-stok" element={<StockCard />} />
-                <Route
-                  path="laporan/transaksi"
-                  element={<TransactionReport />}
+                  path="reports/transactions"
+                  element={<TransactionHistory />}
                 />
                 <Route path="profile" element={<Profile />} />
               </Route>

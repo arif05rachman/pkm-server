@@ -19,7 +19,8 @@ import { config } from "@/config/env";
  */
 export const register = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const { username, email, password, role }: CreateUserRequest = req.body;
+    const { username, email, password, role, employee_id }: CreateUserRequest =
+      req.body;
 
     // Validate required fields
     if (!username || !email || !password) {
@@ -58,7 +59,7 @@ export const register = asyncHandler(
       email,
       password,
       role: role || "user",
-      id_karyawan: req.body.id_karyawan,
+      employee_id: employee_id,
     });
 
     // Generate tokens
@@ -85,7 +86,7 @@ export const register = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
-        id_karyawan: user.id_karyawan,
+        employee_id: user.employee_id,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -107,9 +108,10 @@ export const register = asyncHandler(
 export const login = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const { username, password }: LoginRequest = req.body;
+    console.log(`🔑 Login attempt for user: [${username}]`);
     // Validate required fields
     if (!username || !password) {
-      throw new AppError("username and password are required", 400);
+      throw new AppError("Username and password are required", 400);
     }
 
     // Verify user credentials
@@ -147,7 +149,7 @@ export const login = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
-        id_karyawan: user.id_karyawan,
+        employee_id: user.employee_id,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -184,7 +186,7 @@ export const getProfile = asyncHandler(
         email: user.email,
         role: user.role,
         is_active: user.is_active,
-        id_karyawan: user.id_karyawan,
+        employee_id: user.employee_id,
         created_at: user.created_at,
         updated_at: user.updated_at,
       },
@@ -248,7 +250,7 @@ export const updateProfile = asyncHandler(
         email: updatedUser.email,
         role: updatedUser.role,
         is_active: updatedUser.is_active,
-        id_karyawan: updatedUser.id_karyawan,
+        employee_id: updatedUser.employee_id,
         created_at: updatedUser.created_at,
         updated_at: updatedUser.updated_at,
       },

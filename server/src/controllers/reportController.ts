@@ -5,12 +5,12 @@ import { ApiResponse } from "@/types";
 
 export const getStockCard = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
-    const id_barang = parseInt(req.params.id);
+    const productId = parseInt(req.params.id);
     const startDate = req.query.startDate as string;
     const endDate = req.query.endDate as string;
 
-    if (isNaN(id_barang)) {
-      throw new AppError("ID barang tidak valid", 400);
+    if (isNaN(productId)) {
+      throw new AppError("Invalid product ID", 400);
     }
 
     // Default dates if not provided
@@ -19,60 +19,51 @@ export const getStockCard = asyncHandler(
       ? new Date(startDate)
       : new Date(new Date().setDate(end.getDate() - 30));
 
-    // Get barang details
-    const barangResult = await pool.query(
-      "SELECT * FROM barang WHERE id_barang = $1",
-      [id_barang]
+    // Get product details
+    const productResult = await pool.query(
+      "SELECT * FROM products WHERE id = $1",
+      [productId]
     );
-    if (barangResult.rows.length === 0) {
-      throw new AppError("Barang tidak ditemukan", 404);
+    if (productResult.rows.length === 0) {
+      throw new AppError("Product not found", 404);
     }
-    const barang = barangResult.rows[0];
+    const product = productResult.rows[0];
 
-    // Get transactions
-    // Combine Masuk & Keluar
-    // Note: detailed logic would extract from detail_transaksi_masuk and detail_transaksi_keluar
-    // joined with parent transaction tables.
-
-    // Simplification for now: Fetch all movements
+    // Get transactions (Combine StockIn & StockOut)
     const query = `
       SELECT 
-        'masuk' as type,
-        tm.tanggal_masuk as date,
-        tm.keterangan,
-        dtm.jumlah,
+        'in' as type,
+        si.date as date,
+        si.description,
+        sid.quantity,
         u.username as operator
-      FROM detail_transaksi_masuk dtm
-      JOIN transaksi_masuk tm ON tm.id_transaksi_masuk = dtm.id_transaksi_masuk
-      LEFT JOIN users u ON tm.id_user = u.id
-      WHERE dtm.id_barang = $1 AND tm.tanggal_masuk BETWEEN $2 AND $3
+      FROM stock_in_details sid
+      JOIN stock_ins si ON si.id = sid.stock_in_id
+      LEFT JOIN users u ON si.user_id = u.id
+      WHERE sid.product_id = $1 AND si.date BETWEEN $2 AND $3
       
       UNION ALL
       
       SELECT 
-        'keluar' as type,
-        tk.tanggal_keluar as date,
-        tk.keterangan,
-        dtk.jumlah,
+        'out' as type,
+        so.date as date,
+        so.description,
+        sod.quantity,
         u.username as operator
-      FROM detail_transaksi_keluar dtk
-      JOIN transaksi_keluar tk ON tk.id_transaksi_keluar = dtk.id_transaksi_keluar
-      LEFT JOIN users u ON tk.id_user = u.id
-      WHERE dtk.id_barang = $1 AND tk.tanggal_keluar BETWEEN $2 AND $3
+      FROM stock_out_details sod
+      JOIN stock_outs so ON so.id = sod.stock_out_id
+      LEFT JOIN users u ON so.user_id = u.id
+      WHERE sod.product_id = $1 AND so.date BETWEEN $2 AND $3
       
       ORDER BY date ASC
     `;
 
-    const result = await pool.query(query, [id_barang, start, end]);
-
-    // Calculate running balance if needed, but for now just return the list
-    // Ideally we need starting balance, but that's complex without daily snapshots.
-    // We will just return the movements.
+    const result = await pool.query(query, [productId, start, end]);
 
     res.json({
       success: true,
       data: {
-        barang,
+        product,
         period: { start, end },
         movements: result.rows,
       },
@@ -105,41 +96,41 @@ export const getAllTransactions = asyncHandler(
 
     const query = `
       SELECT 
-        'masuk' as type,
-        tm.tanggal_masuk as date,
-        tm.keterangan,
-        dtm.jumlah,
-        dtm.harga_satuan,
-        b.nama_barang,
-        b.satuan,
-        s.nama_supplier as source_destination,
+        'in' as type,
+        si.date as date,
+        si.description,
+        sid.quantity,
+        sid.unit_price,
+        p.name as product_name,
+        p.unit,
+        s.name as source_destination,
         u.username as operator,
-        tm.id_transaksi_masuk as id
-      FROM detail_transaksi_masuk dtm
-      JOIN transaksi_masuk tm ON tm.id_transaksi_masuk = dtm.id_transaksi_masuk
-      JOIN barang b ON dtm.id_barang = b.id_barang
-      LEFT JOIN supplier s ON tm.id_supplier = s.id_supplier
-      LEFT JOIN users u ON tm.id_user = u.id
-      WHERE tm.tanggal_masuk BETWEEN $1 AND $2
+        si.id as id
+      FROM stock_in_details sid
+      JOIN stock_ins si ON si.id = sid.stock_in_id
+      JOIN products p ON sid.product_id = p.id
+      LEFT JOIN suppliers s ON si.supplier_id = s.id
+      LEFT JOIN users u ON si.user_id = u.id
+      WHERE si.date BETWEEN $1 AND $2
       
       UNION ALL
       
       SELECT 
-        'keluar' as type,
-        tk.tanggal_keluar as date,
-        tk.keterangan,
-        dtk.jumlah,
-        0 as harga_satuan,
-        b.nama_barang,
-        b.satuan,
-        tk.tujuan as source_destination,
+        'out' as type,
+        so.date as date,
+        so.description,
+        sod.quantity,
+        0 as unit_price,
+        p.name as product_name,
+        p.unit,
+        so.destination as source_destination,
         u.username as operator,
-        tk.id_transaksi_keluar as id
-      FROM detail_transaksi_keluar dtk
-      JOIN transaksi_keluar tk ON tk.id_transaksi_keluar = dtk.id_transaksi_keluar
-      JOIN barang b ON dtk.id_barang = b.id_barang
-      LEFT JOIN users u ON tk.id_user = u.id
-      WHERE tk.tanggal_keluar BETWEEN $1 AND $2
+        so.id as id
+      FROM stock_out_details sod
+      JOIN stock_outs so ON so.id = sod.stock_out_id
+      JOIN products p ON sod.product_id = p.id
+      LEFT JOIN users u ON so.user_id = u.id
+      WHERE so.date BETWEEN $1 AND $2
       
       ORDER BY date DESC, id DESC
     `;

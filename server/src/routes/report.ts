@@ -3,13 +3,17 @@ import {
   getStockCard,
   getAllTransactions,
 } from "@/controllers/reportController";
-import { authenticateToken, authorizeRoles } from "@/middleware/auth";
+import { authenticate } from "@/middleware/auth";
 
 const router: Router = Router();
 
-router.use(authenticateToken);
+// All routes require authentication
+router.use(authenticate);
 
+// Get stock card report for a product
 router.get("/stock-card/:id", getStockCard);
+
+// Get all transactions report
 router.get("/transactions", getAllTransactions);
 
 export default router;

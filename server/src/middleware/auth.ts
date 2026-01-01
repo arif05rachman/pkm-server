@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { verifyToken } from "@/utils/jwt";
 import { AuthenticatedRequest } from "@/types";
 import { pool } from "@/config/database";
@@ -6,7 +6,7 @@ import { pool } from "@/config/database";
 /**
  * Authentication middleware to verify JWT token
  */
-export const authenticateToken = async (
+export const authenticate = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
@@ -56,9 +56,14 @@ export const authenticateToken = async (
 };
 
 /**
+ * Legacy name for backward compatibility during refactoring
+ */
+export const authenticateToken = authenticate;
+
+/**
  * Authorization middleware to check user roles
  */
-export const authorizeRoles = (...roles: string[]) => {
+export const authorize = (roles: string[]) => {
   return (
     req: AuthenticatedRequest,
     res: Response,
@@ -83,6 +88,11 @@ export const authorizeRoles = (...roles: string[]) => {
     next();
   };
 };
+
+/**
+ * Legacy name for backward compatibility during refactoring
+ */
+export const authorizeRoles = (roles: string[]) => authorize(roles);
 
 /**
  * Optional authentication middleware (doesn't fail if no token)

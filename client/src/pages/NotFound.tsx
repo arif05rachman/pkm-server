@@ -10,14 +10,14 @@ const NotFound: React.FC = () => {
     <Result
       status="404"
       title="404"
-      subTitle="Maaf, halaman yang Anda cari tidak ditemukan."
+      subTitle="Sorry, the page you are looking for does not exist."
       extra={
         <Button
           type="primary"
           icon={<HomeOutlined />}
           onClick={() => navigate("/dashboard")}
         >
-          Kembali ke Dashboard
+          Back to Dashboard
         </Button>
       }
     />
@@ -25,4 +25,3 @@ const NotFound: React.FC = () => {
 };
 
 export default NotFound;
-
