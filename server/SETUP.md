@@ -90,11 +90,18 @@ curl -X POST http://localhost:4000/api/auth/login \
   }'
 ```
 
-### Default Admin User
+### Default Users (Development/Testing)
 
-- **Email**: admin@inventory.com
-- **Password**: admin123
-- **Role**: admin
+All sample users use the same password: **admin123**
+
+| Username | Email | Password | Role |
+|----------|-------|----------|------|
+| admin | admin@inventory.com | admin123 | admin |
+| dokter.ahmad | ahmad.hidayat@puskesmas.go.id | admin123 | user |
+| bidan.siti | siti.nurhaliza@puskesmas.go.id | admin123 | user |
+| perawat.budi | budi.santoso@puskesmas.go.id | admin123 | manager |
+
+⚠️ **Security Note**: These are development credentials only. Change all passwords in production!
 
 ## 🔧 Troubleshooting
 

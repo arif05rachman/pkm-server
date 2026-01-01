@@ -10,9 +10,6 @@ router.use(authenticate);
 // Get all categories
 router.get("/", categoryController.getAllCategories);
 
-// Search categories
-router.get("/search", categoryController.searchCategories);
-
 // Get category by ID
 router.get("/:id", categoryController.getCategoryById);
 

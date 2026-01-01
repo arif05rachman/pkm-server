@@ -10,8 +10,9 @@ export const getAllUsers = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const searchTerm = req.query.q as string | undefined;
 
-    const result = await UserModel.findAll(page, limit);
+    const result = await UserModel.findAll(page, limit, searchTerm);
 
     const response: PaginatedResponse<Omit<User, "password">> = {
       data: result.users,

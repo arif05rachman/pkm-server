@@ -8,11 +8,15 @@ import {
   Row,
   Col,
   Popconfirm,
+  Card,
+  Breadcrumb,
+  Input,
 } from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   ReloadOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import type { User } from "../../types";
 import type { ColumnsType } from "antd/es/table";
@@ -20,14 +24,15 @@ import { getStatusBadgeProps } from "../../utils/formatters";
 import { useUsers } from "./useUsers";
 import UserModal from "./UserModal";
 
-const { Title } = Typography;
-
 const UserList: React.FC = () => {
   const {
     users,
     employees,
     loading,
     pagination,
+    searchValue,
+    setSearchValue,
+    handleSearch,
     fetchUsers,
     deleteUser,
     changePage,
@@ -101,34 +106,69 @@ const UserList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>User Management</Title>
-      <Row justify="end" align="middle" style={{ marginBottom: 24 }}>
-        <Col>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => fetchUsers(pagination.current, pagination.pageSize)}
-          >
-            Refresh
-          </Button>
-        </Col>
-      </Row>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb items={[{ title: "Home" }, { title: "User Management" }]} />
 
-      <Table
-        columns={columns}
-        dataSource={users}
-        rowKey="id"
-        loading={loading}
-        scroll={{ x: "max-content" }}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} users`,
-          onChange: changePage,
-        }}
-      />
+      <Card>
+        <Row
+          justify="space-between"
+          gutter={[8, 8]}
+          style={{ marginBottom: 16 }}
+        >
+          <Col xs={24} md={12}>
+            <Space.Compact style={{ width: "100%" }}>
+              <Input
+                placeholder="Search by username or email..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onPressEnter={handleSearch}
+                prefix={<SearchOutlined />}
+              />
+              <Button type="primary" onClick={handleSearch}>
+                Search
+              </Button>
+            </Space.Compact>
+          </Col>
+          <Col>
+            <Row justify="end" gutter={[8, 8]}>
+              <Col>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() =>
+                    fetchUsers(
+                      pagination.current,
+                      pagination.pageSize,
+                      searchValue
+                    )
+                  }
+                >
+                  Refresh
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={users}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => (
+              <span>
+                Total <b>{total}</b> users
+              </span>
+            ),
+            onChange: changePage,
+          }}
+        />
+      </Card>
 
       <UserModal
         open={modalVisible}
@@ -138,7 +178,7 @@ const UserList: React.FC = () => {
         onSubmit={handleSubmit}
         form={form}
       />
-    </div>
+    </Space>
   );
 };
 

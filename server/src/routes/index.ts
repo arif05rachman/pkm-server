@@ -64,16 +64,14 @@ router.get("/", (req, res) => {
         deleteById: "DELETE /api/employees/:id",
       },
       products: {
-        getAll: "GET /api/products",
-        search: "GET /api/products/search?q=searchTerm",
+        getAll: "GET /api/products?q=searchTerm",
         getById: "GET /api/products/:id",
         create: "POST /api/products",
         updateById: "PUT /api/products/:id",
         deleteById: "DELETE /api/products/:id",
       },
       categories: {
-        getAll: "GET /api/categories",
-        search: "GET /api/categories/search?q=searchTerm",
+        getAll: "GET /api/categories?q=searchTerm",
         getById: "GET /api/categories/:id",
         create: "POST /api/categories",
         updateById: "PUT /api/categories/:id",

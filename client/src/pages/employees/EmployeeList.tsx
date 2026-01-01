@@ -10,6 +10,9 @@ import {
   Row,
   Col,
   Select,
+  Card,
+  Breadcrumb,
+  Form,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,8 +26,6 @@ import type { ColumnsType } from "antd/es/table";
 import { getStatusBadgeProps } from "../../utils/formatters";
 import { useEmployees } from "./useEmployees";
 import EmployeeModal from "./EmployeeModal";
-
-const { Title } = Typography;
 
 const EmployeeList: React.FC = () => {
   const {
@@ -112,86 +113,101 @@ const EmployeeList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>Employee Management</Title>
-      <Row
-        justify="space-between"
-        align="middle"
-        style={{ marginBottom: 24 }}
-        gutter={[16, 16]}
-      >
-        <Col xs={24} md={12}>
-          <Space.Compact style={{ width: "100%" }}>
-            <Input
-              placeholder="Search by name, NIP, or phone..."
-              allowClear
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onPressEnter={handleSearch}
-              prefix={<SearchOutlined />}
-            />
-            <Button type="primary" onClick={handleSearch}>
-              Search
-            </Button>
-          </Space.Compact>
-        </Col>
-        <Col xs={24} md={12}>
-          <Row justify="end" gutter={[8, 8]}>
-            <Col>
-              <Select
-                value={activeFilter}
-                onChange={handleStatusFilter}
-                style={{ width: 120 }}
-                placeholder="All Status"
-                allowClear
-              >
-                <Select.Option value={true}>Active</Select.Option>
-                <Select.Option value={false}>Inactive</Select.Option>
-              </Select>
-            </Col>
-            <Col>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() =>
-                  fetchEmployees(
-                    pagination.current,
-                    pagination.pageSize,
-                    searchValue,
-                    activeFilter
-                  )
-                }
-              >
-                Refresh
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAdd}
-              >
-                Add Employee
-              </Button>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb
+        items={[{ title: "Home" }, { title: "Employee Management" }]}
+      />
+      <Card>
+        <Form layout="vertical">
+          <Row align="middle" gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item name="status" label="Status">
+                <Select
+                  value={activeFilter}
+                  onChange={handleStatusFilter}
+                  style={{ width: "100%" }}
+                  placeholder="All Status"
+                  allowClear
+                >
+                  <Select.Option value={true}>Active</Select.Option>
+                  <Select.Option value={false}>Inactive</Select.Option>
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
-        </Col>
-      </Row>
+        </Form>
+      </Card>
 
-      <Table
-        columns={columns}
-        dataSource={employees}
-        rowKey="id"
-        loading={loading}
-        scroll={{ x: "max-content" }}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} employees`,
-          onChange: changePage,
-        }}
-      />
+      <Card>
+        <Row
+          justify="space-between"
+          gutter={[8, 8]}
+          style={{ marginBottom: 16 }}
+        >
+          <Col xs={24} md={12}>
+            <Space.Compact style={{ width: "100%" }}>
+              <Input
+                placeholder="Search by name, NIP, or phone..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onPressEnter={handleSearch}
+                prefix={<SearchOutlined />}
+              />
+              <Button type="primary" onClick={handleSearch}>
+                Search
+              </Button>
+            </Space.Compact>
+          </Col>
+          <Col>
+            <Row justify="end" gutter={[8, 8]}>
+              <Col>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() =>
+                    fetchEmployees(
+                      pagination.current,
+                      pagination.pageSize,
+                      searchValue,
+                      activeFilter
+                    )
+                  }
+                >
+                  Refresh
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAdd}
+                >
+                  Add Employee
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={employees}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => (
+              <span>
+                Total <b>{total}</b> employees
+              </span>
+            ),
+            onChange: changePage,
+          }}
+        />
+      </Card>
 
       <EmployeeModal
         open={modalVisible}
@@ -200,7 +216,7 @@ const EmployeeList: React.FC = () => {
         onSubmit={handleSubmit}
         form={form}
       />
-    </div>
+    </Space>
   );
 };
 

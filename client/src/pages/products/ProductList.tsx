@@ -10,6 +10,9 @@ import {
   Row,
   Col,
   Select,
+  Card,
+  Breadcrumb,
+  Form,
 } from "antd";
 import {
   PlusOutlined,
@@ -20,11 +23,8 @@ import {
 } from "@ant-design/icons";
 import type { Product } from "../../types";
 import type { ColumnsType } from "antd/es/table";
-import { getTypeColor } from "../../utils/formatters";
 import { useProducts } from "./useProducts";
 import ProductModal from "./ProductModal";
-
-const { Title } = Typography;
 
 const ProductList: React.FC = () => {
   const {
@@ -45,6 +45,7 @@ const ProductList: React.FC = () => {
     modalVisible,
     editingItem,
     form,
+    formFilter,
     handleAdd,
     handleEdit,
     handleModalCancel,
@@ -67,12 +68,6 @@ const ProductList: React.FC = () => {
       render: (category: string) => (
         <Tag color="blue">{category || "Uncategorized"}</Tag>
       ),
-    },
-    {
-      title: "Type",
-      dataIndex: "type",
-      key: "type",
-      render: (type: any) => <Tag color={getTypeColor(type)}>{type}</Tag>,
     },
     {
       title: "Unit",
@@ -134,103 +129,121 @@ const ProductList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>Product Management</Title>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb
+        items={[{ title: "Home" }, { title: "Product Management" }]}
+      />
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-        <Col xs={24} md={8}>
-          <Space.Compact style={{ width: "100%" }}>
-            <Input
-              placeholder="Search by name or location..."
-              allowClear
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onPressEnter={handleSearch}
-              prefix={<SearchOutlined />}
-            />
-            <Button type="primary" onClick={handleSearch}>
-              Search
-            </Button>
-          </Space.Compact>
-        </Col>
-
-        <Col xs={24} md={16}>
-          <Row justify="end" gutter={[8, 8]}>
-            <Col>
-              <Select
-                placeholder="All Categories"
-                style={{ width: 160 }}
-                allowClear
-                onChange={(val) => handleFilterChange({ category: val })}
-                value={filters.category}
-              >
-                {categories.map((cat) => (
-                  <Select.Option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </Select.Option>
-                ))}
-              </Select>
+      <Card>
+        <Form
+          form={formFilter}
+          layout="vertical"
+          onValuesChange={(_, allValues) => handleFilterChange(allValues)}
+          initialValues={filters}
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item name="category" label="Category">
+                <Select
+                  placeholder="All Categories"
+                  allowClear
+                  style={{ width: "100%" }}
+                >
+                  {categories.map((cat) => (
+                    <Select.Option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
             </Col>
-            <Col>
-              <Select
-                placeholder="All Types"
-                style={{ width: 160 }}
-                allowClear
-                onChange={(val) => handleFilterChange({ type: val })}
-                value={filters.type}
-              >
-                <Select.Option value="Medicine">Medicine</Select.Option>
-                <Select.Option value="Medical Device">
-                  Medical Device
-                </Select.Option>
-                <Select.Option value="Medical Material">
-                  Medical Material
-                </Select.Option>
-              </Select>
-            </Col>
-            <Col>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={() =>
-                  fetchProducts(
-                    pagination.current,
-                    pagination.pageSize,
-                    isSearching ? searchValue : "",
-                    filters
-                  )
-                }
-              >
-                Refresh
-              </Button>
-            </Col>
-            <Col>
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={handleAdd}
-              >
-                Add Product
-              </Button>
+            <Col xs={24} md={8}>
+              <Form.Item name="unit" label="Unit">
+                <Select
+                  placeholder="All Units"
+                  allowClear
+                  style={{ width: "100%" }}
+                >
+                  <Select.Option value="pcs">pcs</Select.Option>
+                  <Select.Option value="bottle">bottle</Select.Option>
+                  <Select.Option value="tablet">tablet</Select.Option>
+                </Select>
+              </Form.Item>
             </Col>
           </Row>
-        </Col>
-      </Row>
+        </Form>
+      </Card>
 
-      <Table
-        columns={columns}
-        dataSource={products}
-        rowKey="id"
-        loading={loading}
-        scroll={{ x: "max-content" }}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} products`,
-          onChange: changePage,
-        }}
-      />
+      <Card>
+        <Row
+          justify="space-between"
+          gutter={[8, 8]}
+          style={{ marginBottom: 16 }}
+        >
+          <Col xs={24} md={12}>
+            <Space.Compact style={{ width: "100%" }}>
+              <Input
+                placeholder="Search by name or location..."
+                allowClear
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onPressEnter={handleSearch}
+                prefix={<SearchOutlined />}
+              />
+              <Button type="primary" onClick={handleSearch}>
+                Search
+              </Button>
+            </Space.Compact>
+          </Col>
+          <Col>
+            <Row justify="end" gutter={[8, 8]}>
+              <Col>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() =>
+                    fetchProducts(
+                      pagination.current,
+                      pagination.pageSize,
+                      isSearching ? searchValue : "",
+                      filters
+                    )
+                  }
+                >
+                  Refresh
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAdd}
+                >
+                  Add Product
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={products}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => (
+              <span>
+                Total <b>{total}</b> products
+              </span>
+            ),
+            onChange: changePage,
+          }}
+        />
+      </Card>
 
       <ProductModal
         open={modalVisible}
@@ -240,7 +253,7 @@ const ProductList: React.FC = () => {
         onSubmit={handleSubmit}
         form={form}
       />
-    </div>
+    </Space>
   );
 };
 

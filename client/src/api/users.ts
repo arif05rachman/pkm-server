@@ -10,12 +10,27 @@ interface UpdateUserRequest {
 }
 
 export const userService = {
-  getAll: async (page = 1, limit = 10): Promise<PaginatedResponse<User>> => {
+  getAll: async (
+    page = 1,
+    limit = 10,
+    searchTerm?: string
+  ): Promise<PaginatedResponse<User>> => {
+    const params: any = { page, limit };
+    if (searchTerm) params.q = searchTerm;
+
     const response = await apiClient.get<ApiResponse<PaginatedResponse<User>>>(
       "/users",
-      { params: { page, limit } }
+      { params }
     );
     return response.data.data;
+  },
+
+  search: async (
+    query: string,
+    page = 1,
+    limit = 10
+  ): Promise<PaginatedResponse<User>> => {
+    return userService.getAll(page, limit, query);
   },
 
   getById: async (id: number): Promise<User> => {

@@ -4,7 +4,6 @@ import type { Product, ApiResponse, PaginatedResponse } from "../types";
 interface CreateProductRequest {
   name: string;
   unit: "pcs" | "bottle" | "tablet";
-  type: "Medicine" | "Medical Device" | "Medical Material";
   category_id?: number;
   min_stock?: number;
   location?: string;
@@ -16,14 +15,14 @@ export const productService = {
   getAll: async (
     page = 1,
     limit = 10,
-    type?: string,
     unit?: string,
-    category?: number
+    category?: number,
+    searchTerm?: string
   ): Promise<PaginatedResponse<Product>> => {
     const params: any = { page, limit };
-    if (type) params.type = type;
     if (unit) params.unit = unit;
     if (category) params.category = category;
+    if (searchTerm) params.q = searchTerm;
 
     const response = await apiClient.get<
       ApiResponse<PaginatedResponse<Product>>
@@ -43,10 +42,7 @@ export const productService = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Product>> => {
-    const response = await apiClient.get<
-      ApiResponse<PaginatedResponse<Product>>
-    >("/products/search", { params: { q: query, page, limit } });
-    return response.data.data;
+    return productService.getAll(page, limit, undefined, undefined, query);
   },
 
   create: async (data: CreateProductRequest): Promise<Product> => {

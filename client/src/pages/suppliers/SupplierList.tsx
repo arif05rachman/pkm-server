@@ -8,6 +8,8 @@ import {
   Typography,
   Row,
   Col,
+  Card,
+  Breadcrumb,
 } from "antd";
 import {
   PlusOutlined,
@@ -21,8 +23,6 @@ import type { Supplier } from "../../types";
 import type { ColumnsType } from "antd/es/table";
 import { useSuppliers } from "./useSuppliers";
 import SupplierModal from "./SupplierModal";
-
-const { Title } = Typography;
 
 const SupplierList: React.FC = () => {
   const {
@@ -98,12 +98,19 @@ const SupplierList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>Supplier Management</Title>
-      <Row justify="end" align="middle" style={{ marginBottom: 24 }}>
-        <Col>
-          <Space wrap>
-            <Space.Compact style={{ width: 300 }}>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb
+        items={[{ title: "Home" }, { title: "Supplier Management" }]}
+      />
+
+      <Card>
+        <Row
+          justify="space-between"
+          gutter={[8, 8]}
+          style={{ marginBottom: 16 }}
+        >
+          <Col xs={24} md={12}>
+            <Space.Compact style={{ width: "100%" }}>
               <Input
                 placeholder="Search suppliers..."
                 allowClear
@@ -116,36 +123,51 @@ const SupplierList: React.FC = () => {
                 Search
               </Button>
             </Space.Compact>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() =>
-                fetchSuppliers(pagination.current, pagination.pageSize)
-              }
-            >
-              Refresh
-            </Button>
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
-              Add Supplier
-            </Button>
-          </Space>
-        </Col>
-      </Row>
-
-      <Table
-        columns={columns}
-        dataSource={suppliers}
-        rowKey="id"
-        loading={loading}
-        scroll={{ x: "max-content" }}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} suppliers`,
-          onChange: changePage,
-        }}
-      />
+          </Col>
+          <Col>
+            <Row justify="end" gutter={[8, 8]}>
+              <Col>
+                <Button
+                  icon={<ReloadOutlined />}
+                  onClick={() =>
+                    fetchSuppliers(pagination.current, pagination.pageSize)
+                  }
+                >
+                  Refresh
+                </Button>
+              </Col>
+              <Col>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={handleAdd}
+                >
+                  Add Supplier
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={suppliers}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => (
+              <span>
+                Total <b>{total}</b> suppliers
+              </span>
+            ),
+            onChange: changePage,
+          }}
+        />
+      </Card>
 
       <SupplierModal
         open={modalVisible}
@@ -154,7 +176,7 @@ const SupplierList: React.FC = () => {
         onSubmit={handleSubmit}
         form={form}
       />
-    </div>
+    </Space>
   );
 };
 

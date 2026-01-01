@@ -141,7 +141,6 @@ export interface Product {
   id: number;
   name: string;
   unit: "pcs" | "bottle" | "tablet";
-  type: "Medicine" | "Medical Device" | "Medical Material";
   category_id: number | null;
   min_stock: number;
   stock: number;
@@ -153,7 +152,6 @@ export interface Product {
 export interface CreateProductRequest {
   name: string;
   unit: "pcs" | "bottle" | "tablet";
-  type: "Medicine" | "Medical Device" | "Medical Material";
   category_id?: number;
   min_stock?: number;
   location?: string;
@@ -162,7 +160,6 @@ export interface CreateProductRequest {
 export interface UpdateProductRequest {
   name?: string;
   unit?: "pcs" | "bottle" | "tablet";
-  type?: "Medicine" | "Medical Device" | "Medical Material";
   category_id?: number;
   min_stock?: number;
   location?: string;

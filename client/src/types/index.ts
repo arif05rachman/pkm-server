@@ -30,7 +30,6 @@ export interface Product {
   id: number;
   name: string;
   unit: "pcs" | "bottle" | "tablet";
-  type: "Medicine" | "Medical Device" | "Medical Material";
   category_id: number | null;
   category_name?: string; // For display
   min_stock: number;

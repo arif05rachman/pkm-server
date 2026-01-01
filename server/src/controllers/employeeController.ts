@@ -61,8 +61,14 @@ export const getAllEmployees = asyncHandler(
         : req.query.is_active === "false"
         ? false
         : undefined;
+    const searchTerm = req.query.q as string | undefined;
 
-    const result = await EmployeeModel.findAll(page, limit, isActive);
+    const result = await EmployeeModel.findAll(
+      page,
+      limit,
+      isActive,
+      searchTerm
+    );
 
     const response: PaginatedResponse<Employee> = {
       data: result.employees,

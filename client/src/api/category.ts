@@ -7,9 +7,15 @@ export const categoryService = {
    */
   getAll: async (
     page = 1,
-    limit = 10
+    limit = 10,
+    searchTerm?: string
   ): Promise<ApiResponse<PaginatedResponse<Category>>> => {
-    const response = await api.get(`/categories?page=${page}&limit=${limit}`);
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+    if (searchTerm) params.append("q", searchTerm);
+    const response = await api.get(`/categories?${params.toString()}`);
     return response.data;
   },
 
@@ -21,10 +27,7 @@ export const categoryService = {
     page = 1,
     limit = 10
   ): Promise<ApiResponse<PaginatedResponse<Category>>> => {
-    const response = await api.get(
-      `/categories/search?q=${query}&page=${page}&limit=${limit}`
-    );
-    return response.data;
+    return categoryService.getAll(page, limit, query);
   },
 
   /**

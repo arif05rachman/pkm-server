@@ -39,27 +39,36 @@ export class CategoryModel {
    */
   static async findAll(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    searchTerm?: string
   ): Promise<{
     categories: Category[];
     total: number;
     totalPages: number;
   }> {
     const offset = (page - 1) * limit;
+    let query = "SELECT * FROM categories WHERE 1=1";
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (searchTerm) {
+      query += ` AND (name ILIKE $${paramIndex} OR description ILIKE $${paramIndex})`;
+      values.push(`%${searchTerm}%`);
+      paramIndex++;
+    }
 
     // Get total count
-    const countQuery = "SELECT COUNT(*) FROM categories";
-    const countResult = await pool.query(countQuery);
+    const countQuery = query.replace("SELECT *", "SELECT COUNT(*)");
+    const countResult = await pool.query(countQuery, values);
     const total = parseInt(countResult.rows[0].count);
 
     // Get categories
-    const query = `
-      SELECT * FROM categories
-      ORDER BY name ASC
-      LIMIT $1 OFFSET $2
-    `;
+    query += ` ORDER BY name ASC LIMIT $${paramIndex} OFFSET $${
+      paramIndex + 1
+    }`;
+    values.push(limit, offset);
 
-    const result = await pool.query(query, [limit, offset]);
+    const result = await pool.query(query, values);
 
     return {
       categories: result.rows,

@@ -12,9 +12,11 @@ interface UpdateSupplierRequest extends Partial<CreateSupplierRequest> {}
 export const supplierService = {
   getAll: async (
     page = 1,
-    limit = 10
+    limit = 10,
+    searchTerm?: string
   ): Promise<PaginatedResponse<Supplier>> => {
     const params: any = { page, limit };
+    if (searchTerm) params.q = searchTerm;
 
     const response = await apiClient.get<
       ApiResponse<PaginatedResponse<Supplier>>
@@ -34,10 +36,7 @@ export const supplierService = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Supplier>> => {
-    const response = await apiClient.get<
-      ApiResponse<PaginatedResponse<Supplier>>
-    >("/suppliers/search", { params: { q: query, page, limit } });
-    return response.data.data;
+    return supplierService.getAll(page, limit, query);
   },
 
   create: async (data: CreateSupplierRequest): Promise<Supplier> => {

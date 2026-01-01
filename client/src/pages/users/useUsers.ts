@@ -8,6 +8,7 @@ export const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -18,6 +19,7 @@ export const useUsers = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<User | null>(null);
   const [form] = Form.useForm();
+  const [formFilter] = Form.useForm();
 
   const fetchEmployees = useCallback(async () => {
     try {
@@ -28,10 +30,10 @@ export const useUsers = () => {
     }
   }, []);
 
-  const fetchUsers = useCallback(async (page = 1, limit = 10) => {
+  const fetchUsers = useCallback(async (page = 1, limit = 10, search = "") => {
     setLoading(true);
     try {
-      const response = await userService.getAll(page, limit);
+      const response = await userService.getAll(page, limit, search);
       setUsers(response.data);
       setPagination({
         current: response.pagination.page,
@@ -45,8 +47,12 @@ export const useUsers = () => {
     }
   }, []);
 
+  const handleSearch = () => {
+    fetchUsers(1, pagination.pageSize, searchValue);
+  };
+
   useEffect(() => {
-    fetchUsers(pagination.current, pagination.pageSize);
+    fetchUsers(pagination.current, pagination.pageSize, searchValue);
     fetchEmployees();
   }, [fetchUsers, fetchEmployees, pagination.current, pagination.pageSize]);
 
@@ -54,7 +60,7 @@ export const useUsers = () => {
     try {
       await userService.delete(id);
       message.success("User deleted successfully");
-      fetchUsers(pagination.current, pagination.pageSize);
+      fetchUsers(pagination.current, pagination.pageSize, searchValue);
     } catch (error: any) {
       message.error(error.response?.data?.message || "Failed to delete user");
     }
@@ -83,7 +89,7 @@ export const useUsers = () => {
         message.success("User updated successfully");
       }
       setModalVisible(false);
-      fetchUsers(pagination.current, pagination.pageSize);
+      fetchUsers(pagination.current, pagination.pageSize, searchValue);
     } catch (error: any) {
       message.error(error.response?.data?.message || "Failed to save user");
     }
@@ -94,12 +100,16 @@ export const useUsers = () => {
     employees,
     loading,
     pagination,
+    searchValue,
+    setSearchValue,
+    handleSearch,
     fetchUsers,
     deleteUser,
     changePage,
     modalVisible,
     editingItem,
     form,
+    formFilter,
     handleEdit,
     handleModalCancel,
     handleSubmit,

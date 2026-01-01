@@ -19,6 +19,7 @@ export const useEmployees = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Employee | null>(null);
   const [form] = Form.useForm();
+  const [formFilter] = Form.useForm();
 
   const fetchEmployees = useCallback(
     async (page = 1, limit = 10, search = "", status?: boolean) => {
@@ -134,6 +135,15 @@ export const useEmployees = () => {
     }
   };
 
+  const handleFilterSubmit = (values: any) => {
+    fetchEmployees(
+      pagination.current,
+      pagination.pageSize,
+      isSearching ? searchValue : "",
+      values.status
+    );
+  };
+
   return {
     employees,
     loading,
@@ -149,9 +159,11 @@ export const useEmployees = () => {
     modalVisible,
     editingItem,
     form,
+    formFilter,
     handleAdd,
     handleEdit,
     handleModalCancel,
     handleSubmit,
+    handleFilterSubmit,
   };
 };

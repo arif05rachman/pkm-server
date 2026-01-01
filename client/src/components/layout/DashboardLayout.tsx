@@ -48,12 +48,7 @@ const StyledHeader = styled(Header)<{ token: any }>`
 
 const StyledContent = styled(Content)<{ token: any }>`
   margin: 24px;
-  padding: 24px;
-  background: ${(props) => props.token.colorBgContainer};
-  border-radius: 12px;
   min-height: calc(100vh - 112px);
-  box-shadow: ${(props) =>
-    props.token.mode === "dark" ? "none" : "0 4px 12px rgba(0, 0, 0, 0.03)"};
 `;
 
 const LogoContainer = styled.div`

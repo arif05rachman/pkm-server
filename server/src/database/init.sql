@@ -295,7 +295,7 @@ ON CONFLICT (nip) DO NOTHING;
 UPDATE users SET employee_id = (SELECT id FROM employees WHERE nip = '196501011990011001' LIMIT 1) 
 WHERE username = 'admin' AND employee_id IS NULL;
 
--- Insert additional sample users
+-- Insert additional sample users (password: admin123 for all)
 INSERT INTO users (username, email, password, role, employee_id, is_active) VALUES
 ('dokter.ahmad', 'ahmad.hidayat@puskesmas.go.id', '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 'user', (SELECT id FROM employees WHERE nip = '196501011990011001' LIMIT 1), true),
 ('bidan.siti', 'siti.nurhaliza@puskesmas.go.id', '$2a$12$Re6IXyyQ2Do3Lhj/OwqcU.NP4FkW4EHBxZDsci3CXHTMajq2KOjYW', 'user', (SELECT id FROM employees WHERE nip = '197502021995022002' LIMIT 1), true),

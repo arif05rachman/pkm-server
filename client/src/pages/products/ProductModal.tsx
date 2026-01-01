@@ -57,41 +57,17 @@ const ProductModal: React.FC<ProductModalProps> = ({
           </Select>
         </Form.Item>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "16px",
-          }}
+        <Form.Item
+          name="unit"
+          label="Unit"
+          rules={[{ required: true, message: "Please select unit!" }]}
         >
-          <Form.Item
-            name="unit"
-            label="Unit"
-            rules={[{ required: true, message: "Please select unit!" }]}
-          >
-            <Select placeholder="Select unit">
-              <Select.Option value="pcs">pcs</Select.Option>
-              <Select.Option value="bottle">bottle</Select.Option>
-              <Select.Option value="tablet">tablet</Select.Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="type"
-            label="Type"
-            rules={[{ required: true, message: "Please select type!" }]}
-          >
-            <Select placeholder="Select type">
-              <Select.Option value="Medicine">Medicine</Select.Option>
-              <Select.Option value="Medical Device">
-                Medical Device
-              </Select.Option>
-              <Select.Option value="Medical Material">
-                Medical Material
-              </Select.Option>
-            </Select>
-          </Form.Item>
-        </div>
+          <Select placeholder="Select unit">
+            <Select.Option value="pcs">pcs</Select.Option>
+            <Select.Option value="bottle">bottle</Select.Option>
+            <Select.Option value="tablet">tablet</Select.Option>
+          </Select>
+        </Form.Item>
 
         <div
           style={{

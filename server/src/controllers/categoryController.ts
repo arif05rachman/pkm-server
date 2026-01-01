@@ -44,8 +44,9 @@ export const getAllCategories = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const searchTerm = req.query.q as string | undefined;
 
-    const result = await CategoryModel.findAll(page, limit);
+    const result = await CategoryModel.findAll(page, limit, searchTerm);
 
     const response: PaginatedResponse<Category> = {
       data: result.categories,
@@ -60,39 +61,6 @@ export const getAllCategories = asyncHandler(
     res.json({
       success: true,
       message: "Categories data retrieved successfully",
-      data: response,
-    });
-  }
-);
-
-/**
- * Search categories by name or description
- */
-export const searchCategories = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const searchTerm = req.query.q as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    if (!searchTerm) {
-      throw new AppError("Search term (q) is required", 400);
-    }
-
-    const result = await CategoryModel.search(searchTerm, page, limit);
-
-    const response: PaginatedResponse<Category> = {
-      data: result.categories,
-      pagination: {
-        page,
-        limit,
-        total: result.total,
-        totalPages: result.totalPages,
-      },
-    };
-
-    res.json({
-      success: true,
-      message: "Categories search results retrieved",
       data: response,
     });
   }

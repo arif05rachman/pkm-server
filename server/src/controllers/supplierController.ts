@@ -50,8 +50,9 @@ export const getAllSuppliers = asyncHandler(
   async (req: Request, res: Response): Promise<void> => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const searchTerm = req.query.q as string | undefined;
 
-    const result = await SupplierModel.findAll(page, limit);
+    const result = await SupplierModel.findAll(page, limit, searchTerm);
 
     const response: PaginatedResponse<Supplier> = {
       data: result.suppliers,
@@ -66,39 +67,6 @@ export const getAllSuppliers = asyncHandler(
     res.json({
       success: true,
       message: "Suppliers data retrieved successfully",
-      data: response,
-    });
-  }
-);
-
-/**
- * Search suppliers by name, address, or contact
- */
-export const searchSuppliers = asyncHandler(
-  async (req: Request, res: Response): Promise<void> => {
-    const searchTerm = req.query.q as string;
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    if (!searchTerm) {
-      throw new AppError("Search term (q) is required", 400);
-    }
-
-    const result = await SupplierModel.search(searchTerm, page, limit);
-
-    const response: PaginatedResponse<Supplier> = {
-      data: result.suppliers,
-      pagination: {
-        page,
-        limit,
-        total: result.total,
-        totalPages: result.totalPages,
-      },
-    };
-
-    res.json({
-      success: true,
-      message: "Suppliers search results retrieved",
       data: response,
     });
   }

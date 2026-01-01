@@ -12,6 +12,8 @@ import {
   Col,
   Tabs,
   Tag,
+  Space,
+  Breadcrumb,
 } from "antd";
 import { UserOutlined, LockOutlined, MailOutlined } from "@ant-design/icons";
 import { useAuth } from "../../contexts/AuthContext";
@@ -23,6 +25,7 @@ const { Title } = Typography;
 const { useApp } = App;
 
 const ProfileContainer = styled.div`
+  width: 100%;
   .profile-header {
     text-align: center;
     padding: 32px 0;
@@ -161,54 +164,60 @@ const Profile: React.FC = () => {
   ];
 
   return (
-    <ProfileContainer>
-      <Title level={2}>User Profile</Title>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb items={[{ title: "Home" }, { title: "User Profile" }]} />
 
-      <Card>
-        <div className="profile-header">
-          <Avatar size={100} icon={<UserOutlined />} />
-          <Title level={3} style={{ marginTop: 16 }}>
-            {user.username}
-          </Title>
-          <Typography.Text type="secondary">{user.email}</Typography.Text>
-        </div>
+      <ProfileContainer>
+        <Card>
+          <div className="profile-header">
+            <Avatar size={100} icon={<UserOutlined />} />
+            <Title level={3} style={{ marginTop: 16 }}>
+              {user.username}
+            </Title>
+            <Typography.Text type="secondary">{user.email}</Typography.Text>
+          </div>
 
-        <Divider />
+          <Divider />
 
-        <Tabs defaultActiveKey="profile" items={tabItems} />
+          <Tabs defaultActiveKey="profile" items={tabItems} />
 
-        <Divider />
+          <Divider />
 
-        <div style={{ background: "#f5f5f5", padding: 16, borderRadius: 8 }}>
-          <Row gutter={16}>
-            <Col span={12}>
-              <Typography.Text type="secondary">Role:</Typography.Text>
-              <div style={{ fontWeight: "bold" }}>
-                <Tag color="gold">{user.role?.toUpperCase()}</Tag>
-              </div>
-            </Col>
-            <Col span={12}>
-              <Typography.Text type="secondary">Status:</Typography.Text>
-              <div style={{ fontWeight: "bold" }}>
-                {user.is_active ? (
-                  <Tag color="success">ACTIVE</Tag>
-                ) : (
-                  <Tag color="error">INACTIVE</Tag>
-                )}
-              </div>
-            </Col>
-            <Col span={12} style={{ marginTop: 16 }}>
-              <Typography.Text type="secondary">Member Since:</Typography.Text>
-              <div>{formatDate(user.created_at)}</div>
-            </Col>
-            <Col span={12} style={{ marginTop: 16 }}>
-              <Typography.Text type="secondary">Last Updated:</Typography.Text>
-              <div>{formatDate(user.updated_at)}</div>
-            </Col>
-          </Row>
-        </div>
-      </Card>
-    </ProfileContainer>
+          <div style={{ background: "#f5f5f5", padding: 16, borderRadius: 8 }}>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Typography.Text type="secondary">Role:</Typography.Text>
+                <div style={{ fontWeight: "bold" }}>
+                  <Tag color="gold">{user.role?.toUpperCase()}</Tag>
+                </div>
+              </Col>
+              <Col span={12}>
+                <Typography.Text type="secondary">Status:</Typography.Text>
+                <div style={{ fontWeight: "bold" }}>
+                  {user.is_active ? (
+                    <Tag color="success">ACTIVE</Tag>
+                  ) : (
+                    <Tag color="error">INACTIVE</Tag>
+                  )}
+                </div>
+              </Col>
+              <Col span={12} style={{ marginTop: 16 }}>
+                <Typography.Text type="secondary">
+                  Member Since:
+                </Typography.Text>
+                <div>{formatDate(user.created_at)}</div>
+              </Col>
+              <Col span={12} style={{ marginTop: 16 }}>
+                <Typography.Text type="secondary">
+                  Last Updated:
+                </Typography.Text>
+                <div>{formatDate(user.updated_at)}</div>
+              </Col>
+            </Row>
+          </div>
+        </Card>
+      </ProfileContainer>
+    </Space>
   );
 };
 

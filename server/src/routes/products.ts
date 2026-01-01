@@ -10,9 +10,6 @@ router.use(authenticate);
 // Get all products with pagination and filters
 router.get("/", productController.getAllProducts);
 
-// Search products
-router.get("/search", productController.searchProducts);
-
 // Get product by ID
 router.get("/:id", productController.getProductById);
 

@@ -10,9 +10,6 @@ router.use(authenticate);
 // Get all suppliers
 router.get("/", supplierController.getAllSuppliers);
 
-// Search suppliers
-router.get("/search", supplierController.searchSuppliers);
-
 // Get supplier by ID
 router.get("/:id", supplierController.getSupplierById);
 

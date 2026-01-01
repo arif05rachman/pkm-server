@@ -12,6 +12,8 @@ import {
   Col,
   DatePicker,
   Tag,
+  Card,
+  Breadcrumb,
 } from "antd";
 import {
   PlusOutlined,
@@ -40,6 +42,7 @@ const StockOutList: React.FC = () => {
     useState<StockOut | null>(null);
   const [editingItem, setEditingItem] = useState<StockOut | null>(null);
   const [form] = Form.useForm();
+  const [formFilter] = Form.useForm();
   const { message } = App.useApp();
   const [pagination, setPagination] = useState({
     current: 1,
@@ -218,24 +221,35 @@ const StockOutList: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>Stock Out Transactions</Title>
-      <Row
-        justify="space-between"
-        align="middle"
-        style={{ marginBottom: 24 }}
-        gutter={[16, 16]}
-      >
-        <Col xs={24} md={12}>
-          <Space wrap>
-            <RangePicker onChange={handleDateRangeChange} format="YYYY-MM-DD" />
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb
+        items={[{ title: "Home" }, { title: "Stock Out Transactions" }]}
+      />
+
+      <Card>
+        <Form form={formFilter} layout="vertical">
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item name="dateRange" label="Date Range">
+                <RangePicker
+                  onChange={handleDateRangeChange}
+                  format="YYYY-MM-DD"
+                  style={{ width: "100%" }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+
+      <Card>
+        <Row justify="end" gutter={[8, 8]} style={{ marginBottom: 16 }}>
+          <Col>
             <Button icon={<ReloadOutlined />} onClick={fetchData}>
               Refresh
             </Button>
-          </Space>
-        </Col>
-        <Col xs={24} md={12}>
-          <Row justify="end">
+          </Col>
+          <Col>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -247,31 +261,34 @@ const StockOutList: React.FC = () => {
             >
               Issue Stock
             </Button>
-          </Row>
-        </Col>
-      </Row>
-
-      <Table
-        columns={columns}
-        dataSource={transactions}
-        rowKey="id"
-        loading={loading}
-        scroll={{ x: "max-content" }}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} transactions`,
-          onChange: (page, pageSize) => {
-            setPagination((prev) => ({
-              ...prev,
-              current: page,
-              pageSize,
-            }));
-          },
-        }}
-      />
+          </Col>
+        </Row>
+        <Table
+          columns={columns}
+          dataSource={transactions}
+          rowKey="id"
+          loading={loading}
+          scroll={{ x: "max-content" }}
+          pagination={{
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            showSizeChanger: true,
+            showTotal: (total) => (
+              <span>
+                Total <b>{total}</b> transactions
+              </span>
+            ),
+            onChange: (page, pageSize) => {
+              setPagination((prev) => ({
+                ...prev,
+                current: page,
+                pageSize,
+              }));
+            },
+          }}
+        />
+      </Card>
 
       <StockOutModal
         open={modalVisible}
@@ -367,7 +384,7 @@ const StockOutList: React.FC = () => {
           </div>
         )}
       </Modal>
-    </div>
+    </Space>
   );
 };
 

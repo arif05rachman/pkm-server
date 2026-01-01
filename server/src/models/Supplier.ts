@@ -39,27 +39,36 @@ export class SupplierModel {
    */
   static async findAll(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    searchTerm?: string
   ): Promise<{
     suppliers: Supplier[];
     total: number;
     totalPages: number;
   }> {
     const offset = (page - 1) * limit;
+    let query = "SELECT * FROM suppliers WHERE 1=1";
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (searchTerm) {
+      query += ` AND (name ILIKE $${paramIndex} OR address ILIKE $${paramIndex} OR contact ILIKE $${paramIndex})`;
+      values.push(`%${searchTerm}%`);
+      paramIndex++;
+    }
 
     // Get total count
-    const countQuery = "SELECT COUNT(*) FROM suppliers";
-    const countResult = await pool.query(countQuery);
+    const countQuery = query.replace("SELECT *", "SELECT COUNT(*)");
+    const countResult = await pool.query(countQuery, values);
     const total = parseInt(countResult.rows[0].count);
 
     // Get suppliers
-    const query = `
-      SELECT * FROM suppliers
-      ORDER BY created_at DESC
-      LIMIT $1 OFFSET $2
-    `;
+    query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${
+      paramIndex + 1
+    }`;
+    values.push(limit, offset);
 
-    const result = await pool.query(query, [limit, offset]);
+    const result = await pool.query(query, values);
 
     return {
       suppliers: result.rows,

@@ -11,6 +11,7 @@ import {
   DatePicker,
   Radio,
   Tag,
+  Breadcrumb,
 } from "antd";
 
 import reportService from "../../api/report";
@@ -18,7 +19,7 @@ import { formatDate, formatCurrency } from "../../utils/formatters";
 import dayjs from "dayjs";
 import type { ColumnsType } from "antd/es/table";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { RangePicker } = DatePicker;
 
 interface TransactionDetail {
@@ -145,60 +146,60 @@ const TransactionHistory: React.FC = () => {
       .reduce((acc, curr) => acc + curr.quantity * curr.unit_price, 0) || 0;
 
   return (
-    <div>
-      <Title level={2}>Transaction History Report</Title>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb
+        items={[{ title: "Home" }, { title: "Transaction History Report" }]}
+      />
 
-      <Card style={{ marginBottom: 24 }}>
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Row align="middle" gutter={[16, 16]}>
-            <Col>
-              <Radio.Group
-                value={reportType}
-                onChange={(e) => setReportType(e.target.value)}
-              >
-                <Radio.Button value="monthly">Monthly</Radio.Button>
-                <Radio.Button value="yearly">Yearly</Radio.Button>
-                <Radio.Button value="custom">Custom Range</Radio.Button>
-              </Radio.Group>
-            </Col>
-            <Col>
-              {reportType === "monthly" && (
-                <DatePicker
-                  picker="month"
-                  value={selectedMonth}
-                  onChange={(val) => val && setSelectedMonth(val)}
-                  allowClear={false}
-                />
-              )}
-              {reportType === "yearly" && (
-                <DatePicker
-                  picker="year"
-                  value={selectedYear}
-                  onChange={(val) => val && setSelectedYear(val)}
-                  allowClear={false}
-                />
-              )}
-              {reportType === "custom" && (
-                <RangePicker
-                  value={customRange}
-                  onChange={(val) => val && setCustomRange([val[0]!, val[1]!])}
-                  allowClear={false}
-                />
-              )}
-            </Col>
-          </Row>
-        </Space>
+      <Card title="Filter">
+        <Row align="middle" gutter={[16, 16]}>
+          <Col>
+            <Radio.Group
+              value={reportType}
+              onChange={(e) => setReportType(e.target.value)}
+            >
+              <Radio.Button value="monthly">Monthly</Radio.Button>
+              <Radio.Button value="yearly">Yearly</Radio.Button>
+              <Radio.Button value="custom">Custom Range</Radio.Button>
+            </Radio.Group>
+          </Col>
+          <Col>
+            {reportType === "monthly" && (
+              <DatePicker
+                picker="month"
+                value={selectedMonth}
+                onChange={(val) => val && setSelectedMonth(val)}
+                allowClear={false}
+              />
+            )}
+            {reportType === "yearly" && (
+              <DatePicker
+                picker="year"
+                value={selectedYear}
+                onChange={(val) => val && setSelectedYear(val)}
+                allowClear={false}
+              />
+            )}
+            {reportType === "custom" && (
+              <RangePicker
+                value={customRange}
+                onChange={(val) => val && setCustomRange([val[0]!, val[1]!])}
+                allowClear={false}
+              />
+            )}
+          </Col>
+        </Row>
       </Card>
 
       {data && (
-        <Card>
+        <Card title="Report Summary">
           <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
             <Col xs={24} md={8}>
               <Statistic
                 title="Total Stock In Value"
                 value={totalStockInValue}
                 formatter={(value) => formatCurrency(Number(value))}
-                valueStyle={{ color: "#3f8600" }}
+                styles={{ content: { color: "#3f8600" } }}
               />
             </Col>
             <Col xs={12} md={8}>
@@ -215,7 +216,7 @@ const TransactionHistory: React.FC = () => {
                 value={
                   data.transactions.filter((t) => t.type === "keluar").length
                 }
-                valueStyle={{ color: "#cf1322" }}
+                styles={{ content: { color: "#cf1322" } }}
               />
             </Col>
           </Row>
@@ -225,13 +226,12 @@ const TransactionHistory: React.FC = () => {
             columns={columns}
             rowKey={(r) => `${r.type}-${r.id}-${r.product_name}`}
             pagination={{ pageSize: 20 }}
-            size="small"
             loading={loading}
             scroll={{ x: "max-content" }}
           />
         </Card>
       )}
-    </div>
+    </Space>
   );
 };
 

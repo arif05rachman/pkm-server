@@ -8,9 +8,9 @@ export class ProductModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    type?: string,
     unit?: string,
-    categoryId?: number
+    categoryId?: number,
+    searchTerm?: string
   ): Promise<{ products: any[]; total: number; totalPages: number }> {
     const offset = (page - 1) * limit;
     let query = `
@@ -21,12 +21,6 @@ export class ProductModel {
     `;
     const values: any[] = [];
     let paramIndex = 1;
-
-    if (type) {
-      query += ` AND p.type = $${paramIndex}`;
-      values.push(type);
-      paramIndex++;
-    }
 
     if (unit) {
       query += ` AND p.unit = $${paramIndex}`;
@@ -40,16 +34,26 @@ export class ProductModel {
       paramIndex++;
     }
 
+    if (searchTerm) {
+      query += ` AND (p.name ILIKE $${paramIndex} OR p.location ILIKE $${paramIndex})`;
+      values.push(`%${searchTerm}%`);
+      paramIndex++;
+    }
+
     // Get total count for pagination
     const countQuery = `
       SELECT COUNT(*) 
       FROM products p 
       WHERE 1=1
-      ${type ? ` AND type = $1` : ""}
-      ${unit ? ` AND unit = $${type ? 2 : 1}` : ""}
+      ${unit ? ` AND p.unit = $1` : ""}
+      ${categoryId ? ` AND p.category_id = $${(unit ? 1 : 0) + 1}` : ""}
       ${
-        categoryId
-          ? ` AND category_id = $${(type ? 1 : 0) + (unit ? 1 : 0) + 1}`
+        searchTerm
+          ? ` AND (p.name ILIKE $${
+              (unit ? 1 : 0) + (categoryId ? 1 : 0) + 1
+            } OR p.location ILIKE $${
+              (unit ? 1 : 0) + (categoryId ? 1 : 0) + 1
+            })`
           : ""
       }
     `;
@@ -127,20 +131,13 @@ export class ProductModel {
    * Create new product
    */
   static async create(data: CreateProductRequest): Promise<Product> {
-    const { name, unit, type, category_id, min_stock, location } = data;
+    const { name, unit, category_id, min_stock, location } = data;
     const query = `
-      INSERT INTO products (name, unit, type, category_id, min_stock, stock, location)
-      VALUES ($1, $2, $3, $4, $5, 0, $6)
+      INSERT INTO products (name, unit, category_id, min_stock, stock, location)
+      VALUES ($1, $2, $3, $4, 0, $5)
       RETURNING *
     `;
-    const values = [
-      name,
-      unit,
-      type,
-      category_id || null,
-      min_stock || 0,
-      location,
-    ];
+    const values = [name, unit, category_id || null, min_stock || 0, location];
 
     const result = await pool.query(query, values);
     return result.rows[0];

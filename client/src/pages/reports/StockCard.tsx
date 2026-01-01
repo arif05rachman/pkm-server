@@ -11,6 +11,8 @@ import {
   Empty,
   App,
   Tag,
+  Space,
+  Breadcrumb,
 } from "antd";
 import reportService from "../../api/report";
 import productService from "../../api/product";
@@ -19,7 +21,7 @@ import type { Product } from "../../types";
 import dayjs from "dayjs";
 import type { ColumnsType } from "antd/es/table";
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { RangePicker } = DatePicker;
 
 interface StockMovement {
@@ -134,10 +136,10 @@ const StockCard: React.FC = () => {
   ];
 
   return (
-    <div>
-      <Title level={2}>Stock Card Report</Title>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
+      <Breadcrumb items={[{ title: "Home" }, { title: "Stock Card Report" }]} />
 
-      <Card style={{ marginBottom: 24 }}>
+      <Card title="Filter">
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} md={12}>
             <Text strong>Select Product:</Text>
@@ -179,7 +181,7 @@ const StockCard: React.FC = () => {
                 value={dataSource
                   .filter((m) => m.type === "masuk")
                   .reduce((acc, curr) => acc + curr.quantity, 0)}
-                valueStyle={{ color: "#3f8600" }}
+                styles={{ content: { color: "#3f8600" } }}
                 suffix={reportData.product.unit}
               />
             </Col>
@@ -189,7 +191,7 @@ const StockCard: React.FC = () => {
                 value={dataSource
                   .filter((m) => m.type === "keluar")
                   .reduce((acc, curr) => acc + curr.quantity, 0)}
-                valueStyle={{ color: "#cf1322" }}
+                styles={{ content: { color: "#cf1322" } }}
                 suffix={reportData.product.unit}
               />
             </Col>
@@ -212,15 +214,16 @@ const StockCard: React.FC = () => {
             columns={columns}
             rowKey={(r) => r.date + r.type + r.quantity}
             pagination={false}
-            size="small"
             loading={loading}
             scroll={{ x: "max-content" }}
           />
         </Card>
       ) : (
-        <Empty description="Please select a product to view the stock card" />
+        <Card>
+          <Empty description="Please select a product to view the stock card" />
+        </Card>
       )}
-    </div>
+    </Space>
   );
 };
 

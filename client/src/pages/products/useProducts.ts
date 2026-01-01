@@ -16,7 +16,6 @@ export const useProducts = () => {
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [filters, setFilters] = useState({
-    type: undefined as string | undefined,
     unit: undefined as string | undefined,
     category: undefined as number | undefined,
   });
@@ -25,6 +24,7 @@ export const useProducts = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Product | null>(null);
   const [form] = Form.useForm();
+  const [formFilter] = Form.useForm();
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -46,7 +46,6 @@ export const useProducts = () => {
           response = await productService.getAll(
             page,
             limit,
-            currentFilters.type,
             currentFilters.unit,
             currentFilters.category
           );
@@ -160,6 +159,10 @@ export const useProducts = () => {
     }
   };
 
+  const handleFilterSubmit = (values: any) => {
+    handleFilterChange(values);
+  };
+
   return {
     products,
     categories,
@@ -177,9 +180,11 @@ export const useProducts = () => {
     modalVisible,
     editingItem,
     form,
+    formFilter,
     handleAdd,
     handleEdit,
     handleModalCancel,
     handleSubmit,
+    handleFilterSubmit,
   };
 };

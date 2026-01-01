@@ -65,28 +65,40 @@ export class UserModel {
    */
   static async findAll(
     page: number = 1,
-    limit: number = 10
+    limit: number = 10,
+    searchTerm?: string
   ): Promise<{
     users: Omit<User, "password">[];
     total: number;
     totalPages: number;
   }> {
     const offset = (page - 1) * limit;
+    let query =
+      "SELECT id, username, email, role, is_active, employee_id, created_at, updated_at FROM users WHERE 1=1";
+    const values: any[] = [];
+    let paramIndex = 1;
+
+    if (searchTerm) {
+      query += ` AND (username ILIKE $${paramIndex} OR email ILIKE $${paramIndex})`;
+      values.push(`%${searchTerm}%`);
+      paramIndex++;
+    }
 
     // Get total count
-    const countQuery = "SELECT COUNT(*) FROM users";
-    const countResult = await pool.query(countQuery);
+    const countQuery = query.replace(
+      "SELECT id, username, email, role, is_active, employee_id, created_at, updated_at FROM users",
+      "SELECT COUNT(*)"
+    );
+    const countResult = await pool.query(countQuery, values);
     const total = parseInt(countResult.rows[0].count);
 
     // Get users
-    const query = `
-      SELECT id, username, email, role, is_active, employee_id, created_at, updated_at
-      FROM users
-      ORDER BY created_at DESC
-      LIMIT $1 OFFSET $2
-    `;
+    query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${
+      paramIndex + 1
+    }`;
+    values.push(limit, offset);
 
-    const result = await pool.query(query, [limit, offset]);
+    const result = await pool.query(query, values);
 
     return {
       users: result.rows,

@@ -12,7 +12,8 @@ export class EmployeeModel {
   static async findAll(
     page: number = 1,
     limit: number = 10,
-    isActive?: boolean
+    isActive?: boolean,
+    searchTerm?: string
   ): Promise<{ employees: Employee[]; total: number; totalPages: number }> {
     const offset = (page - 1) * limit;
     let query = "SELECT * FROM employees WHERE 1=1";
@@ -22,6 +23,12 @@ export class EmployeeModel {
     if (isActive !== undefined) {
       query += ` AND is_active = $${paramIndex}`;
       values.push(isActive);
+      paramIndex++;
+    }
+
+    if (searchTerm) {
+      query += ` AND (name ILIKE $${paramIndex} OR position ILIKE $${paramIndex} OR nip ILIKE $${paramIndex})`;
+      values.push(`%${searchTerm}%`);
       paramIndex++;
     }
 

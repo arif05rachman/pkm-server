@@ -16,10 +16,12 @@ export const employeeService = {
   getAll: async (
     page = 1,
     limit = 10,
-    isActive?: boolean
+    isActive?: boolean,
+    searchTerm?: string
   ): Promise<PaginatedResponse<Employee>> => {
     const params: any = { page, limit };
     if (isActive !== undefined) params.is_active = isActive;
+    if (searchTerm) params.q = searchTerm;
 
     const response = await apiClient.get<
       ApiResponse<PaginatedResponse<Employee>>
@@ -39,10 +41,7 @@ export const employeeService = {
     page = 1,
     limit = 10
   ): Promise<PaginatedResponse<Employee>> => {
-    const response = await apiClient.get<
-      ApiResponse<PaginatedResponse<Employee>>
-    >("/employees/search", { params: { q: query, page, limit } });
-    return response.data.data;
+    return employeeService.getAll(page, limit, undefined, query);
   },
 
   create: async (data: CreateEmployeeRequest): Promise<Employee> => {
