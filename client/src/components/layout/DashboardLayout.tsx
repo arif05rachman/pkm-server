@@ -87,12 +87,12 @@ const DashboardLayout: React.FC = () => {
       label: "Dashboard",
     },
     {
-      key: "/dashboard/employees",
+      key: "/employees",
       icon: <TeamOutlined />,
       label: "Employees",
     },
     {
-      key: "/dashboard/users",
+      key: "/users",
       icon: <UsergroupAddOutlined />,
       label: "Users",
     },
@@ -102,19 +102,19 @@ const DashboardLayout: React.FC = () => {
       label: "Product Master",
       children: [
         {
-          key: "/dashboard/products",
+          key: "/products",
           icon: <AppstoreOutlined />,
           label: "Products",
         },
         {
-          key: "/dashboard/categories",
+          key: "/categories",
           icon: <TagsOutlined />,
           label: "Categories",
         },
       ],
     },
     {
-      key: "/dashboard/suppliers",
+      key: "/suppliers",
       icon: <ShoppingCartOutlined />,
       label: "Suppliers",
     },
@@ -124,12 +124,12 @@ const DashboardLayout: React.FC = () => {
       label: "Transactions",
       children: [
         {
-          key: "/dashboard/stock-in",
+          key: "/stock-in",
           icon: <ImportOutlined />,
           label: "Stock In",
         },
         {
-          key: "/dashboard/stock-out",
+          key: "/stock-out",
           icon: <ExportOutlined />,
           label: "Stock Out",
         },
@@ -141,12 +141,12 @@ const DashboardLayout: React.FC = () => {
       label: "Reports",
       children: [
         {
-          key: "/dashboard/reports/stock-card",
+          key: "/reports/stock-card",
           icon: <FileTextOutlined />,
           label: "Stock Card",
         },
         {
-          key: "/dashboard/reports/transactions",
+          key: "/reports/transaction-history",
           icon: <FileTextOutlined />,
           label: "Transaction History",
         },
@@ -168,7 +168,7 @@ const DashboardLayout: React.FC = () => {
       key: "profile",
       icon: <UserOutlined />,
       label: "Profile",
-      onClick: () => navigate("/dashboard/profile"),
+      onClick: () => navigate("/profile"),
     },
     {
       type: "divider" as const,
@@ -185,19 +185,13 @@ const DashboardLayout: React.FC = () => {
   // Handle menu selection for nested routes
   const getSelectedKeys = () => {
     const path = location.pathname;
-    if (
-      path.startsWith("/dashboard/stock-in") ||
-      path.startsWith("/dashboard/stock-out")
-    ) {
+    if (path.startsWith("/stock-in") || path.startsWith("/stock-out")) {
       return ["transactions", path];
     }
-    if (path.startsWith("/dashboard/reports")) {
+    if (path.startsWith("/reports")) {
       return ["reports", path];
     }
-    if (
-      path.startsWith("/dashboard/products") ||
-      path.startsWith("/dashboard/categories")
-    ) {
+    if (path.startsWith("/products") || path.startsWith("/categories")) {
       return ["products_master", path];
     }
     return [path];
