@@ -185,7 +185,6 @@ const StockOutList: React.FC = () => {
       title: "Actions",
       key: "action",
       fixed: "right",
-      width: 220,
       render: (_: any, record: StockOut) => (
         <Space size="middle">
           <Button

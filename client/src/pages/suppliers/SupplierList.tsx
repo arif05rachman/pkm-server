@@ -71,7 +71,7 @@ const SupplierList: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      width: 150,
+      fixed: "right",
       render: (_: any, record: Supplier) => (
         <Space size="middle">
           <Button
@@ -136,6 +136,7 @@ const SupplierList: React.FC = () => {
         dataSource={suppliers}
         rowKey="id"
         loading={loading}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,

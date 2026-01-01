@@ -56,7 +56,6 @@ const ProductList: React.FC = () => {
       title: "Product Name",
       dataIndex: "name",
       key: "name",
-      fixed: "left",
       render: (text: string) => (
         <Typography.Text strong>{text}</Typography.Text>
       ),
@@ -109,7 +108,6 @@ const ProductList: React.FC = () => {
       title: "Action",
       key: "action",
       fixed: "right",
-      width: 150,
       render: (_: any, record: Product) => (
         <Space size="middle">
           <Button

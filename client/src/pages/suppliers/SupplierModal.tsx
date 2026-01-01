@@ -24,7 +24,7 @@ const SupplierModal: React.FC<SupplierModalProps> = ({
       open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}

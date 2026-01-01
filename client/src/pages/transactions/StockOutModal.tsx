@@ -159,7 +159,6 @@ const StockOutModal: React.FC<StockOutModalProps> = ({
                   {
                     title: "Quantity",
                     key: "quantity",
-                    width: 150,
                     render: (_, field) => (
                       <Form.Item
                         {...field}
@@ -198,7 +197,6 @@ const StockOutModal: React.FC<StockOutModalProps> = ({
                   {
                     title: "",
                     key: "action",
-                    width: 50,
                     render: (_, field) => (
                       <Button
                         type="text"

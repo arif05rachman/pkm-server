@@ -66,7 +66,7 @@ const CategoryList: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      width: 200,
+      fixed: "right",
       render: (_: any, record: Category) => (
         <Space size="middle">
           <Button
@@ -131,6 +131,7 @@ const CategoryList: React.FC = () => {
         dataSource={categories}
         rowKey="id"
         loading={loading}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,

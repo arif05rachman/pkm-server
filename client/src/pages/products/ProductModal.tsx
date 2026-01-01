@@ -26,7 +26,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
       open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      destroyOnClose
+      destroyOnHidden
       width={600}
     >
       <Form

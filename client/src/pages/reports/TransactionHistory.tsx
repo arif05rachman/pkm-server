@@ -85,14 +85,12 @@ const TransactionHistory: React.FC = () => {
       title: "Date",
       dataIndex: "date",
       key: "date",
-      width: 120,
       render: (date) => formatDate(date),
     },
     {
       title: "Type",
       dataIndex: "type",
       key: "type",
-      width: 100,
       render: (type) => (
         <Tag color={type === "masuk" ? "success" : "volcano"}>
           {type === "masuk" ? "STOCK IN" : "STOCK OUT"}

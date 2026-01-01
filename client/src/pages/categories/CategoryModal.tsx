@@ -24,7 +24,7 @@ const CategoryModal: React.FC<CategoryModalProps> = ({
       open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}

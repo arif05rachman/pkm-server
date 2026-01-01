@@ -192,7 +192,6 @@ const StockInList: React.FC = () => {
       title: "Actions",
       key: "action",
       fixed: "right",
-      width: 220,
       render: (_: any, record: StockIn) => (
         <Space size="middle">
           <Button

@@ -74,7 +74,7 @@ const UserList: React.FC = () => {
     {
       title: "Action",
       key: "action",
-      width: 150,
+      fixed: "right",
       render: (_: any, record: User) => (
         <Space size="middle">
           <Button
@@ -119,6 +119,7 @@ const UserList: React.FC = () => {
         dataSource={users}
         rowKey="id"
         loading={loading}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: pagination.current,
           pageSize: pagination.pageSize,

@@ -178,7 +178,6 @@ const StockInModal: React.FC<StockInModalProps> = ({
                   {
                     title: "Quantity",
                     key: "quantity",
-                    width: 120,
                     render: (_, field) => (
                       <Form.Item
                         {...field}
@@ -197,7 +196,6 @@ const StockInModal: React.FC<StockInModalProps> = ({
                   {
                     title: "Unit Price",
                     key: "unit_price",
-                    width: 150,
                     render: (_, field) => (
                       <Form.Item
                         {...field}
@@ -224,7 +222,6 @@ const StockInModal: React.FC<StockInModalProps> = ({
                   {
                     title: "Expiry Date",
                     key: "expiry_date",
-                    width: 150,
                     render: (_, field) => (
                       <Form.Item
                         {...field}
@@ -241,7 +238,6 @@ const StockInModal: React.FC<StockInModalProps> = ({
                   {
                     title: "",
                     key: "action",
-                    width: 50,
                     render: (_, field) => (
                       <Button
                         type="text"

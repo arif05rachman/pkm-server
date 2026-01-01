@@ -24,7 +24,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
       open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
-      destroyOnClose
+      destroyOnHidden
     >
       <Form
         form={form}
